@@ -1,0 +1,40 @@
+:root {
+	/* Input Color */
+	--input-bg: theme(colors.neutral.900);
+	--input-bg-focus: theme(colors.neutral.800);
+	--input-placeholder: theme(colors.surface.300);
+
+	/* Input Sizing */
+	--input-w: 15em;
+	--input-h: 3.75em;
+
+	/* Input Border */
+	--input-border: theme(colors.surface.300);
+	--input-border-focus: theme(colors.surface.200);
+}
+
+.form__input {
+	@apply outline-none px-4;
+	@apply border;
+	@apply focus:(border-$input-border-focus/50 brightness-110 saturate-50);
+	width: var(--input-w);
+	height: var(--input-h);
+	color: var(--input-placeholder);
+	background-color: var(--input-bg);
+	border-color: var(--input-border);
+}
+
+.form__input:hover {
+	background-color: var(--input-bg-focus);
+}
+
+.form__input:focus {
+	background-color: var(--input-bg-focus);
+	border-color: var(--input-border-focus);
+}
+
+.form__input--error {
+}
+
+.form__input--valid {
+}

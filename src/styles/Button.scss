@@ -1,0 +1,30 @@
+:root {
+	/* Button Color */
+	--btn-bg-primary: theme(colors.primary.300);
+	--btn-bg-secondary: theme(colors.secondary.300);
+	--btn-bg: theme(colors.neutral.800);
+	--btn-bg-hover: rgba(252, 141, 23, 0.8);
+	--btn-text-hover: theme(colors.neutral.800);
+
+	/* Button Sizing */
+	--btn-w: 340px;
+	--btn-h: 60px;
+}
+
+.btn {
+	@apply w-$btn-w h-$btn-h bg-$btn-bg flex justify-center items-center;
+}
+
+.btn-size-only {
+	@apply w-$btn-w h-$btn-h flex justify-center items-center;
+}
+
+.btn:hover {
+	background-color: var(--btn-bg-hover);
+	color: rgb(26, 26, 26);
+	border: 1px solid rgb(26, 26, 26);
+	font-weight: 400;
+	font-size: 2rem;
+	transition: background-color 100ms linear;
+	filter: drop-shadow(16px 16px 20px rgba(56, 39, 38, 0.212)) brightness(1.1);
+}

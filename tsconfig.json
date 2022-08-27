@@ -1,0 +1,39 @@
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": false,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"isolatedModules": false,
+		"types": [
+			"vitest/globals",
+			"@testing-library/jest-dom"
+		],
+		"paths": {
+			"$features": [
+				"src/features"
+			],
+			"$features/*": [
+				"src/features/*"
+			],
+			"$lib": [
+				"src/lib"
+			],
+			"$lib/*": [
+				"src/lib/*"
+			],
+			"$routes": [
+				"src/routes"
+			],
+			"$routes/*": [
+				"src/routes/*"
+			]
+		}
+	}
+}
