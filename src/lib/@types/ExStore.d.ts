@@ -28,13 +28,24 @@ export interface ExSlice<T = any> {
 /**
  * ExStore is a Svelte Store that can be used to create Redux-like stores.
  *
- * Example:
+ * @example
+ * <caption>Create a slice</caption>
  * ```typescript
- * import { exStore } from 'svelte-exstore';
- *
- * const store = exStore({name: 'count', initialValue: 0, reducers: {
- * 	increase: (state: number, action: Action) => state + action.payload,
- * }});
+ *	const count = exSlice({
+ *		name: 'count',
+ *		initialValue: 0,
+ *		reducers: {
+ *			increase: (state) {
+ *				state += 1;
+ *			},
+ *			decrease: (state) {
+ *				state -= 1;
+ *			},
+ *			increaseByValue: (state, action) {
+ *				state += action.payload;
+ *			}
+ *		}
+ *	})
  * ```
  */
 export type CreateExSlice<T = any> = (
