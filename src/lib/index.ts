@@ -4,10 +4,10 @@ import type { ExStore } from './@types/ExStore';
 import type { ExStoreEnhancer } from './@types/ExStoreEnhancer';
 import withReduxDevtools from './enhancers/withReduxDevtools';
 
-function exSlice<T = any>(
+function exSlice<T>(
 	{ name, initialValue, reducers }: ExSlice<T>,
 	enhancers?: ExStoreEnhancer<T>[]
-): CreateExSlice {
+): CreateExSlice<T> {
 	const { set, subscribe, update } = writable(initialValue);
 
 	const store: ExStore<T> = {
@@ -20,7 +20,7 @@ function exSlice<T = any>(
 	};
 
 	const toBeReduced = [withReduxDevtools<T>, ...(enhancers || [])];
-	const withEnhancers = toBeReduced.reduce((next, enhancer) => enhancer(next), store);
+	const withEnhancers = toBeReduced.reduce((next, enhancer) => enhancer(next), store) as ExStore<T>;
 
 	return withEnhancers;
 }

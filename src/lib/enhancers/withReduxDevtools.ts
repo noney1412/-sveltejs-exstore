@@ -1,16 +1,9 @@
-import type { Writable } from 'svelte/store';
 import type { ExStore } from '../@types/ExStore';
 
-interface ReduxDevtools<T> {
-	store: ExStore<T>;
-	options?: { latency: number };
-}
+type Options = { latency: number };
 
-function withReduxDevtools<T = any>(
-	store: ReduxDevtools<T>['store'],
-	options: ReduxDevtools<T>['options'] = { latency: 100 }
-) {
-	return {};
+function withReduxDevtools<T>(store: ExStore<T>, options?: Options): ExStore<T> {
+	return { store, hello: 'world' };
 }
 
 export default withReduxDevtools;
