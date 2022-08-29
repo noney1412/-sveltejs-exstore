@@ -20,11 +20,11 @@ import type { ExStoreEnhancer } from './ExStoreEnhancer';
  *	}
  *	```
  */
-export interface ExSlice<T = any> {
+export interface ExSlice<TState = any> {
 	name: string;
-	initialValue: T;
+	initialValue: TState;
 	reducers: {
-		[key: string]: Reducer<T>;
+		[key: string]: Reducer<TState>;
 	};
 }
 
