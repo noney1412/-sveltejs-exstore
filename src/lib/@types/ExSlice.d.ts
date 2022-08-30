@@ -1,5 +1,5 @@
 import type { Reducer } from './ExReducer';
-import type { ExStore } from './ExStore';
+import type { ExStore } from './Store';
 import type { ExStoreEnhancer } from './ExStoreEnhancer';
 
 /**

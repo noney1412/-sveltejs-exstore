@@ -1,28 +1,14 @@
-import { writable } from 'svelte/store';
-import type { CreateExSlice, ExSlice } from './@types/ExSlice';
-import type { ExStore } from './@types/ExStore';
-import type { ExStoreEnhancer } from './@types/ExStoreEnhancer';
-import withReduxDevtools from './enhancers/withReduxDevtools';
+import { writable } from "svelte/store";
+import type { CreateAction } from "./@types/Action";
 
-function exSlice<T>(
-	{ name, initialValue, reducers }: ExSlice<T>,
-	enhancers?: ExStoreEnhancer<T>[]
-): CreateExSlice<T> {
-	const { set, subscribe, update } = writable(initialValue);
+function exSlice<State, Action>(initialValue: State, fn: CreateAction<State, Action>) {
+	const { set, subscribe, update } = writable<State>(initialValue);
 
-	const store: ExStore<T> = {
-		name,
-		initialValue,
-		subscribe,
-		set,
-		update,
-		reducers
-	};
+	const actions = fn(update, set, subscribe);
 
-	const toBeReduced = [withReduxDevtools<T>, ...(enhancers || [])];
-	const withEnhancers = toBeReduced.reduce((next, enhancer) => enhancer(next), store) as ExStore<T>;
+	const store = { set, subscribe, update, ...actions };
 
-	return withEnhancers;
+	return store;
 }
 
 export default exSlice;
