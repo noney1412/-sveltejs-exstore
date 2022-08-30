@@ -1,14 +1,15 @@
-import exSlice, { ExAction } from './exSlice';
-import type { ExSlice } from './exSlice';
+import exSlice, { CreateStore } from './exSlice';
+import type { Action } from './exSlice';
 import { get } from 'svelte/store';
 
-interface Count extends ExSlice {
+interface Count extends Action {
+	name: 'count';
 	increase: () => void;
 	increaseBy: (value: number) => void;
 }
 
 test('should use as zustand', () => {
-	const countUpdated: ExAction<number, Count> = (update) => {
+	const countUpdated: CreateStore<number, Count> = (update) => {
 		return {
 			name: 'count',
 			increase: () => update((n) => n + 1),
