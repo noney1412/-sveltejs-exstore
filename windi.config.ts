@@ -8,6 +8,7 @@ const config: FullConfig = {
 	theme: {
 		screens: {
 			desktop: '1024px',
+			wide: '1900px',
 			sm: '640px',
 			md: '768px',
 			lg: '1024px',

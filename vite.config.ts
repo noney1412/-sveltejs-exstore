@@ -3,7 +3,7 @@
 
 import { sveltekit } from '@sveltejs/kit/vite';
 import WindiCSS from 'vite-plugin-windicss';
-import { UserConfigExport } from 'vite';
+import type { UserConfigExport } from 'vite';
 import { resolve } from 'path';
 
 const config: UserConfigExport = {
@@ -21,7 +21,7 @@ const config: UserConfigExport = {
 		}
 	},
 	server: {
-		port: parseInt(process.env.PORT) || 5500
+		port: parseInt(process.env.PORT!) || 5500
 	}
 };
 
