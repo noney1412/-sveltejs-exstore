@@ -1,6 +1,6 @@
 import { writable, Writable } from 'svelte/store';
 
-interface WritableProvider<TState, TReturnState> {
+export interface ExAction<TState, TReturnState> {
 	(
 		update: Writable<TState>['update'],
 		set: Writable<TState>['set'],
@@ -14,7 +14,7 @@ export interface ExSlice {
 
 function exSlice<TState, TAction extends ExSlice>(
 	initialValue: TState,
-	fn: WritableProvider<TState, TAction>
+	fn: ExAction<TState, TAction>
 ) {
 	const { set, subscribe, update } = writable<TState>(initialValue);
 

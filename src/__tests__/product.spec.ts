@@ -1,4 +1,4 @@
-import exSlice from './exSlice';
+import exSlice, { ExAction } from './exSlice';
 import type { ExSlice } from './exSlice';
 import { get } from 'svelte/store';
 
@@ -8,11 +8,15 @@ interface Count extends ExSlice {
 }
 
 test('should use as zustand', () => {
-	const count = exSlice<number, Count>(0, (update) => ({
-		name: 'count',
-		increase: () => update((count) => count + 1),
-		increaseBy: (value: number) => update((count) => count + value)
-	}));
+	const countUpdated: ExAction<number, Count> = (update) => {
+		return {
+			name: 'count',
+			increase: () => update((n) => n + 1),
+			increaseBy: (value: number) => update((n) => n + value)
+		};
+	};
+
+	const count = exSlice<number, Count>(0, countUpdated);
 
 	count.increase();
 
