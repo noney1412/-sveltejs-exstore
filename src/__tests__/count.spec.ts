@@ -1,6 +1,6 @@
-import exSlice from '$lib';
-import type { Action } from '$lib/@types/Action';
-import type { CreateAction } from '$lib/@types/Action';
+import exStore from '$lib';
+import type { Action } from '$lib/types/Action';
+import type { CreateAction } from '$lib/types/Action';
 import { get } from 'svelte/store';
 
 interface Count extends Action {
@@ -20,7 +20,7 @@ const countAction: CreateAction<number, Count> = (update) => ({
 });
 
 test('count with increasing the number.', () => {
-	const count = exSlice<number, Count>(0, countAction);
+	const count = exStore<number, Count>(0, countAction);
 
 	count.increase();
 
