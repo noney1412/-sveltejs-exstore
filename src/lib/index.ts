@@ -1,7 +1,7 @@
-import { writable } from "svelte/store";
-import type { CreateAction } from "./@types/Action";
+import { writable } from 'svelte/store';
+import type { CreateAction } from './types/Action';
 
-function exSlice<State, Action>(initialValue: State, fn: CreateAction<State, Action>) {
+function exStore<State, Action>(initialValue: State, fn: CreateAction<State, Action>) {
 	const { set, subscribe, update } = writable<State>(initialValue);
 
 	const actions = fn(update, set, subscribe);
@@ -11,4 +11,4 @@ function exSlice<State, Action>(initialValue: State, fn: CreateAction<State, Act
 	return store;
 }
 
-export default exSlice;
+export default exStore;
