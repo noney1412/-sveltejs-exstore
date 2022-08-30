@@ -1,28 +1,22 @@
-import { produce } from 'immer';
-import { get } from 'svelte/store';
 import exSlice from './exSlice';
+import type { ExSlice } from './exSlice';
+import { get } from 'svelte/store';
 
-test('should ', () => {
-	const update = (fn: (state: any) => void, state?: any) => {
-		return produce(state, fn);
-	};
+interface Count extends ExSlice {
+	increase: () => void;
+	increaseBy: (value: number) => void;
+}
 
-	const count = exSlice({
+test('should use as zustand', () => {
+	const count = exSlice<number, Count>(0, (update) => ({
 		name: 'count',
-		initialValue: 0,
-		increase: () => {
-			update((state) => {
-				state + 1;
-			});
-		},
-		increaseBy: (amount: number) => {
-			update((state) => {
-				state + amount;
-			});
-		}
-	});
+		increase: () => update((count) => count + 1),
+		increaseBy: (value: number) => update((count) => count + value)
+	}));
 
-	count.set(3);
+	count.increase();
+
+	expect(get(count)).toBe(1);
 
 	console.log(get(count));
 });

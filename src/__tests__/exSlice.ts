@@ -1,26 +1,31 @@
-import { Writable, writable } from 'svelte/store';
+import { writable, Writable } from 'svelte/store';
 
-interface ExSlice<T = any> {
-	name: string;
-	initialValue: T;
+interface WritableProvider<TState, TReturnState> {
+	(
+		update: Writable<TState>['update'],
+		set: Writable<TState>['set'],
+		subscribe: Writable<TState>['subscribe']
+	): TReturnState;
 }
 
-const exSlice = <TSlice, T = any>(slice: TSlice & ExSlice<T> & Record<string, any>) => {
-	const { set, subscribe, update } = writable(slice.initialValue);
+export interface ExSlice {
+	name: string;
+}
 
-	for (const fn in slice) {
-		console.log(typeof slice[fn] === 'function');
-		console.log(fn);
-	}
+function exSlice<TState, TAction extends ExSlice>(
+	initialValue: TState,
+	fn: WritableProvider<TState, TAction>
+) {
+	const { set, subscribe, update } = writable<TState>(initialValue);
 
-	const store: Writable<typeof slice.initialValue> & TSlice = {
-		subscribe,
+	const result = fn(update, set, subscribe);
+
+	return {
 		set,
+		subscribe,
 		update,
-		...slice
+		...result
 	};
-
-	return store;
-};
+}
 
 export default exSlice;
