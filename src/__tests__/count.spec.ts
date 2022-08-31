@@ -4,13 +4,13 @@ import type { CreateExAction } from '$lib/types/ExAction';
 import { get } from 'svelte/store';
 
 interface Count extends ExAction {
-	name: 'count';
+	exName: 'count';
 	increase: () => void;
 	increaseBy: (amount: number) => void;
 }
 
 const countAction: CreateExAction<number, Count> = (update) => ({
-	name: 'count',
+	exName: 'count',
 	increase: () => {
 		update((n) => n + 1);
 	},

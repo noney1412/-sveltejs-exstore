@@ -1,10 +1,7 @@
 import { writable } from 'svelte/store';
 import type { CreateExAction } from './types/ExAction';
 
-function exStore<State, Action>(
-	initialValue: State,
-	fn: CreateExAction<State, Omit<Action, 'name'>>
-) {
+function exStore<State, Action>(initialValue: State, fn: CreateExAction<State, Action>) {
 	const { set, subscribe, update } = writable<State>(initialValue);
 
 	const actions = fn(update, set, subscribe);

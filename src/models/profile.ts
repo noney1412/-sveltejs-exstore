@@ -2,23 +2,13 @@ import exStore from '$lib';
 import type { ExAction } from '$lib/types/ExAction';
 
 interface Profile {
-	nameA: string;
+	name: string;
 	age: number;
 }
 
 interface ProfileAction extends ExAction {
-	name: 'profile';
-	set: (x: Profile) => void;
+	exName: 'profile';
 }
-export const profile = exStore<Profile | string, ProfileAction>(
-	{
-		nameA: 'John Doe',
-		age: 25
-	},
-	(update, set) => ({
-		name: 'profile',
-		set: (x) => {
-			set(JSON.stringify(x));
-		}
-	})
-);
+export const profile = exStore<Profile, ProfileAction>({} as Profile, (update, set) => ({
+	exName: 'profile'
+}));

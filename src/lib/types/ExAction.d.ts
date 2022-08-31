@@ -4,7 +4,7 @@ import type { Writable } from 'svelte/store';
  * Action is to provide the name and function used within the store.
  */
 export interface ExAction extends Record<string, unknown> {
-	name: string;
+	exName: string;
 }
 
 /**
