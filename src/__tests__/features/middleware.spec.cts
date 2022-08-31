@@ -39,5 +39,6 @@ test('middleware concept', () => {
 
 test('try implement json middleware', () => {
 	const profile = exStore({ name: 'John Doe', age: 60 }, () => ({}), [toJSON]);
-	expect(get(profile)).toBeInstanceOf(String);
+	expect(typeof get(profile)).toEqual('string');
+	console.log(profile.raw);
 });

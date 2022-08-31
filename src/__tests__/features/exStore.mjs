@@ -1,16 +1,19 @@
 import { writable } from 'svelte/store';
 
-function exStore(initialValue, fn, middlewares) {
+function applyMiddlewares(middlewares, next) {
+	return middlewares.reduce((next, middleware) => middleware(next), next);
+}
 
-	if(middlewares) { 
-		const initialValue = middlewares.reduce((initialValue, middleware) => middleware(initialValue), initialValue);
+function exStore(initialValue, fn, middlewares) {
+	let parsed;
+
+	if (middlewares) {
+		parsed = applyMiddlewares(middlewares, { next: initialValue }).next;
 	}
 	// must be applied the initial value with middlewares
-	const { set, subscribe, update } = writable(initialValue);
+	const { set, subscribe, update } = writable(parsed);
 
-	console.log(typeof middlewares[0](initialValue));
-
-	return fn;
+	return { set, subscribe, update };
 }
 
 export default exStore;
