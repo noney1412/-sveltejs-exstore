@@ -13,8 +13,8 @@
 		bg="red-400"
 		border="rounded-xl"
 	>
-		<h1>{$profile.nameA}</h1>
-		<h2>{$profile.age}</h2>
+		<h1>{$profile.name ?? ''}</h1>
+		<h2>{$profile.age ?? ''}</h2>
 	</div>
 
 	<div class="row-container" flex="~" gap="12px">
@@ -25,6 +25,7 @@
 			border="rounded-xl"
 			flex="1"
 			placeholder="name"
+			bind:value={$profile.name}
 		/>
 		<input
 			class="form__input"
