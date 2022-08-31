@@ -1,16 +1,16 @@
 import exStore from '$lib';
-import type { Action } from '$lib/types/Action';
-import type { CreateAction } from '$lib/types/Action';
+import type { ExAction } from '$lib/types/ExAction';
+import type { CreateExAction } from '$lib/types/ExAction';
 import { get } from 'svelte/store';
 
-interface Count extends Action {
-	name: 'count';
+interface Count extends ExAction {
+	exName: 'count';
 	increase: () => void;
 	increaseBy: (amount: number) => void;
 }
 
-const countAction: CreateAction<number, Count> = (update) => ({
-	name: 'count',
+const countAction: CreateExAction<number, Count> = (update) => ({
+	exName: 'count',
 	increase: () => {
 		update((n) => n + 1);
 	},
