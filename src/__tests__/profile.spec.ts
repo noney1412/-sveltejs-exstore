@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { profile } from '../models/profile';
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import Profile from '../components/Profile.svelte';
+import Profile from '$components/Profile.svelte';
 
 test('parse profile object to json', () => {
 	profile.set({ name: 'John Doe', age: 60 });
