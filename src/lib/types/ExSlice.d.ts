@@ -1,4 +1,4 @@
-import type { OnlyPrimitive } from './utils';
+import type { OnlyFunc, OnlyPrimitive } from './utils';
 
 /**
  * exSlice is the parameter object for exStore.
