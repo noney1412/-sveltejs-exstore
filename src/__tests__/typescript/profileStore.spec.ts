@@ -1,4 +1,5 @@
-import { writable, Writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 
 type AnyVoidFunction = (...args: never[]) => void;
 
@@ -40,17 +41,23 @@ function exStore(slice: ExSlice<Profile>): ReturnExStore<Profile> {
 	return customStore;
 }
 
-const profile = exStore({
-	name: 'profile-store',
-	initialValue: { name: 'John Doe', age: 60 },
-	actions: (update) => ({
-		changeName(name: string) {
-			update((state) => ({
-				...state,
-				name
-			}));
-		}
-	})
+test('profile store action', () => {
+	const profile = exStore({
+		name: 'profile-store',
+		initialValue: { name: 'John Doe', age: 60 },
+		actions: (update) => ({
+			changeName(name: string) {
+				update((state) => ({
+					...state,
+					name
+				}));
+			}
+		})
+	});
+
+	profile.changeName('Sam Wilson');
+
+	console.log(get(profile));
 });
 
 // update function conflicts with the update function from the actions
