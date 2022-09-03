@@ -2,8 +2,12 @@ import type { Writable } from 'svelte/store';
 import type { ExSlice } from './ExSlice';
 import type { OnlyFunc, OnlyPrimitive } from './utils';
 
+
+type ExStore<State> =  Writable<OnlyPrimitive<State>> & OnlyFunc<State>;
+
 /** 
  * ReturnType of the {@link CreateExStore<State>}
+ * @alias {@link ExStore<State>}
  * @typeParam State - initial value.
 */
 type ReturnExStore<State> = Writable<OnlyPrimitive<State>> & OnlyFunc<State>;
