@@ -1,7 +1,7 @@
 import type { Writable } from 'svelte/store';
 import type { OnlyFunc, OnlyPrimitive } from './utils';
 /**
- * ExSlice is the parameter object to init ExStore.
+ * ExSlice is the object to init ExStore.
  * @typeParam State - initial value.
  */
 export type ExSlice<State> = {

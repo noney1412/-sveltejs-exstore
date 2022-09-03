@@ -4,7 +4,7 @@ function applyMiddlewares(middlewares, next) {
 	return middlewares.reduce((next, middleware) => middleware(next), next);
 }
 
-function exStore(initialValue, fn, middlewares) {
+function exStore(initialValue, middlewares) {
 	let parsed;
 
 	if (middlewares) {

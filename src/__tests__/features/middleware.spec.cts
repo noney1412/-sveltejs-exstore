@@ -38,7 +38,7 @@ test('middleware concept', () => {
 });
 
 test('try implement json middleware', () => {
-	const profile = exStore({ name: 'John Doe', age: 60 }, () => ({}), [toJSON]);
+	const profile = exStore({ name: 'John Doe', age: 60 }, [toJSON]);
 	expect(typeof get(profile)).toEqual('string');
 	console.log(profile.raw);
 });

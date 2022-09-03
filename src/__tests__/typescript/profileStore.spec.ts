@@ -1,15 +1,8 @@
 import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
-type AnyVoidFunction = (...args: never[]) => void;
 
-type PickFunctionFromObject<Props> = {
-	[Key in keyof Props]: Props[Key] extends AnyVoidFunction ? Key : never;
-}[keyof Props];
 
-type OnlyFunc<T> = Pick<T, PickFunctionFromObject<T>>;
-
-type OnlyProps<T> = Omit<T, PickFunctionFromObject<T>>;
 
 interface ExSlice<State> {
 	name: string;
@@ -17,7 +10,7 @@ interface ExSlice<State> {
 	actions: (update: Writable<OnlyProps<State>>['update']) => OnlyFunc<State>;
 }
 
-type ReturnExStore<State> = Writable<OnlyProps<State>> & OnlyFunc<State>;
+
 
 interface Profile {
 	name: string;
@@ -27,6 +20,7 @@ interface Profile {
 
 function exStore(slice: ExSlice<Profile>): ReturnExStore<Profile> {
 	const { name, initialValue, actions } = slice;
+
 	const store = writable<OnlyProps<Profile>>(initialValue);
 
 	const { changeName } = actions(store.update);
@@ -59,7 +53,3 @@ test('profile store action', () => {
 
 	console.log(get(profile));
 });
-
-// update function conflicts with the update function from the actions
-
-// expect to return Writable<Props> & Actions

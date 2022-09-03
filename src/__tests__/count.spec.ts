@@ -21,12 +21,8 @@ const countAction: CreateExAction<number, Count> = (update) => ({
 
 test('count with increasing the number.', () => {
 	const count = exStore<number, Count>(0, countAction);
-
 	count.increase();
-
 	expect(get(count)).toBe(1);
-
 	count.increaseBy(5);
-
 	expect(get(count)).toBe(6);
 });
