@@ -17,8 +17,7 @@ const config: UserConfigExport = {
 	resolve: {
 		alias: {
 			$routes: resolve('./src/routes'),
-			$models: resolve('./src/models'),
-			$components: resolve('./src/components'),
+			$examples: resolve('./src/examples'),
 		}
 	},
 	server: {

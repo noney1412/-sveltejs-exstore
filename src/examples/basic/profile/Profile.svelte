@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { profile } from '$models/profile';
+	import { profile } from './profile';
 </script>
 
 <div class="column-container" flex="~ col" gap="18px">
@@ -13,13 +13,14 @@
 		bg="red-400"
 		border="rounded-xl"
 	>
-		<h1>{$profile.name ?? ''}</h1>
-		<h2>{$profile.age ?? ''}</h2>
+		<h1 data-testid="display-name">{$profile.name ?? ''}</h1>
+		<h2 data-testid="display-age">{$profile.age ?? ''}</h2>
 	</div>
 
 	<div class="row-container" flex="~" gap="12px">
 		<input
 			class="form__input"
+			data-testid="input-name"
 			type="text"
 			h="60px"
 			border="rounded-xl"
@@ -29,6 +30,7 @@
 		/>
 		<input
 			class="form__input"
+			data-testid="input-age"
 			type="text"
 			h="60px"
 			border="rounded-xl"
