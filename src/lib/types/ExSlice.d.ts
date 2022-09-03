@@ -1,14 +1,22 @@
 import type { OnlyFunc, OnlyPrimitive } from './utils';
 
 /**
- * exSlice is the parameter object for exStore.
- * @param name is the name of the store, which is used in devtools.
- * @initialValue is the initial value of the store by type State.
- * @actions is the function that contains all the actions of the store.
+ * ExSlice is the parameter object for exStore.
+ * @typeParam State - initial value.
  */
 export type ExSlice<State> = {
+	/**
+	 * The name of the store, which is used in devtools.
+	 */
 	name: string;
+	/**
+	 * The initial value of State.
+	 * - extract only the primitive types of the State.
+	 */
 	initialValue: OnlyPrimitive<State>;
+	/**
+	 * The actions is the function that contains all the actions of the store.
+	 * - extract only the function types of the State.
+	 */
 	actions: (update: Writable<OnlyPrimitive<State>>['update']) => OnlyFunc<State>;
 };
-
