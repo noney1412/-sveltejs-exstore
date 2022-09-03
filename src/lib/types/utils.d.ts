@@ -1,4 +1,4 @@
-type AnyVoidFunction = (...args: never[]) => void;
+export type AnyVoidFunction = (...args: never[]) => void;
 
 /**
  * Extract function from object.

@@ -1,19 +1,21 @@
 import { writable } from 'svelte/store';
-import type { CreateExAction } from './types/ExAction';
+import type { ExSlice } from './types/ExSlice';
+import type { CreateExStore } from './types/ExStore';
+import type { OnlyPrimitive } from './types/utils';
 
-function exStore<State, Action>(initialValue: State, fn: CreateExAction<State, Action>) {
-	const { set, subscribe, update } = writable<State>(initialValue);
+const exStore: CreateExStore = <State>(slice: ExSlice<State>) => {
+	const { subscribe, update, set } = writable<OnlyPrimitive<State>>(slice.initialValue);
 
-	const actions = fn(update, set, subscribe);
+	const actions = slice.actions(update);
 
 	const store = {
-		set,
 		subscribe,
 		update,
+		set,
 		...actions
 	};
 
 	return store;
-}
+};
 
 export default exStore;
