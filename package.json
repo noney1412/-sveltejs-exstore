@@ -1,10 +1,10 @@
 {
-	"name": "extend-town-webpage",
+	"name": "svelte-exstore",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev --host --mode development",
 		"build": "vite build",
-		"package": "svelte-kit package",
+		"package": "svelte-package",
 		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
@@ -20,6 +20,7 @@
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/adapter-static": "1.0.0-next.39",
 		"@sveltejs/kit": "next",
+		"@sveltejs/package": "1.0.0-next.3",
 		"@testing-library/dom": "^8.17.1",
 		"@testing-library/jest-dom": "^5.16.5",
 		"@testing-library/svelte": "^3.2.1",
