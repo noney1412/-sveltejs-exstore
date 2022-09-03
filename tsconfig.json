@@ -16,23 +16,11 @@
 			"@testing-library/jest-dom"
 		],
 		"paths": {
-			"$features": [
-				"src/features"
+			"$examples": [
+				"src/examples"
 			],
-			"$features/*": [
-				"src/features/*"
-			],
-			"$models": [
-				"src/models"
-			],
-			"$models/*": [
-				"src/models/*"
-			],
-			"$components": [
-				"src/components"
-			],
-			"$components/*": [
-				"src/components/*"
+			"$examples/*": [
+				"src/examples/*"
 			],
 			"$lib": [
 				"src/lib"
