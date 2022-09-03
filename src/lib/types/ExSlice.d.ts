@@ -1,3 +1,4 @@
+import type { Writable } from 'svelte/store';
 import type { OnlyFunc, OnlyPrimitive } from './utils';
 
 /**
