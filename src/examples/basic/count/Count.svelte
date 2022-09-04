@@ -11,8 +11,8 @@
 	align="items-center"
 	gap="18px"
 >
-	<h1 class="">{$count}</h1>
-	<div class="" flex="~" w="full" h="60px" justify="center">
+	<h1>{$count}</h1>
+	<div flex="~" w="full" h="60px" justify="center">
 		<button on:click={count.decrease} w="60px" h="full" bg="dark-50">-</button>
 		<input
 			bind:value={$count}
