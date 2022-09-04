@@ -5,25 +5,23 @@ import Count from './Count.svelte';
 
 test('increase the number', () => {
 	interface Count {
-		value: number;
+		$initialValue: number;
 		increase: () => void;
 	}
 
 	const count = exStore<Count>({
 		name: 'count',
-		initialValue: {
-			value: 0
-		},
+		initialValue: 0,
 		actions: (update) => ({
-			increase: () => update((state) => ({ value: state.value + 1 }))
+			increase: () => update((state) => state + 1)
 		})
 	});
 
-	expect(get(count).value).toBe(0);
+	expect(get(count)).toBe(0);
 
 	count.increase();
 
-	expect(get(count).value).toBe(1);
+	expect(get(count)).toBe(1);
 });
 
 test('render <Count /> and fire click & input events.', async () => {
@@ -52,9 +50,9 @@ test('render <Count /> and fire click & input events.', async () => {
 	});
 
 	await fireEvent.click(reset);
-	
+
 	expect(number).toHaveTextContent('0');
-	
+
 	await fireEvent.click(increase);
 
 	expect(number).toHaveTextContent('1');
