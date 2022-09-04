@@ -1,7 +1,7 @@
 import exStore from '$lib';
 
 export interface Count {
-	value: number;
+	$initialValue: number;
 	increase: () => void;
 	decrease: () => void;
 	increaseBy: (by: number) => void;
@@ -9,15 +9,13 @@ export interface Count {
 }
 export const count = exStore<Count>({
 	name: 'count',
-	initialValue: {
-		value: 0
-	},
+	initialValue: 0,
 	actions: (update, set) => ({
-		increase: () => update((state) => ({ value: state.value + 1 })),
-		increaseBy: (by) => update((state) => ({ value: state.value + by })),
-		decrease: () => update((state) => ({ value: state.value - 1 })),
+		increase: () => update((state) => state + 1),
+		increaseBy: (by) => update((state) => state + by),
+		decrease: () => update((state) => state - 1),
 		reset() {
-			set({ value: 0 });
+			set(0);
 		}
 	})
 });

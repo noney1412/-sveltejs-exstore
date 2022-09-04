@@ -11,11 +11,11 @@
 	align="items-center"
 	gap="18px"
 >
-	<h1 class="">{$count.value}</h1>
+	<h1 class="">{$count}</h1>
 	<div class="" flex="~" w="full" h="60px" justify="center">
 		<button on:click={count.decrease} w="60px" h="full" bg="dark-50">-</button>
 		<input
-			bind:value={$count.value}
+			bind:value={$count}
 			class="form__input"
 			flex="~"
 			type="number"
