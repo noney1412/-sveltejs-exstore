@@ -1,9 +1,10 @@
 <script>
+	import Count from '$examples/basic/count/Count.svelte';
 </script>
 
 <div class="page" w="screen" h="screen">
 	<div class="page-content" w="full" h="full" flex="~" justify="center" align="items-center">
-		<a href="/examples/count">count example</a>
+		<Count />
 	</div>
 </div>
 
