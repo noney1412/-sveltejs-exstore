@@ -17,11 +17,11 @@ const config: UserConfigExport = {
 	resolve: {
 		alias: {
 			$routes: resolve('./src/routes'),
-			$examples: resolve('./src/examples'),
+			$examples: resolve('./src/examples')
 		}
 	},
 	server: {
-		port: parseInt(process.env.PORT!) || 5500
+		port: parseInt(process.env.PORT ?? '5500') || 5500
 	}
 };
 
