@@ -6,7 +6,7 @@ import type { OnlyPrimitive } from './types/utils';
 const exStore: CreateExStore = <State>(slice: ExSlice<State>) => {
 	const { subscribe, update, set } = writable<OnlyPrimitive<State>>(slice.initialValue);
 
-	const actions = slice.actions(update);
+	const actions = slice.actions(update, set, subscribe);
 
 	const store = {
 		subscribe,

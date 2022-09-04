@@ -18,5 +18,9 @@ export type ExSlice<State> = {
 	 * The actions is the function that contains all the actions of the store.
 	 * - extract only the function types of the State.
 	 */
-	actions: (update: Writable<OnlyPrimitive<State>>['update']) => OnlyFunc<State>;
+	actions: (
+		update: Writable<OnlyPrimitive<State>>['update'],
+		set: Writable<OnlyPrimitive<State>>['set'],
+		subscribe: Writable<OnlyPrimitive<State>>['subscribe']
+	) => OnlyFunc<State>;
 };
