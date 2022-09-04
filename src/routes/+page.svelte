@@ -1,10 +1,9 @@
 <script>
-	import Profile from '../components/Profile.svelte';
 </script>
 
 <div class="page" w="screen" h="screen">
 	<div class="page-content" w="full" h="full" flex="~" justify="center" align="items-center">
-		<Profile />
+		<a href="/examples/count">count example</a>
 	</div>
 </div>
 
