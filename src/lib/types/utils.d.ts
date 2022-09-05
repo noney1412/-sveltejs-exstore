@@ -1,3 +1,5 @@
+export type Nullable<T> = T | undefined | null;
+
 export type AnyVoidFunction = (...args: never[]) => void;
 
 /**

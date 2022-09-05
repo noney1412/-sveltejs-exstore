@@ -67,8 +67,8 @@ test('stage 3: with immer and custom writable<Profile>', () => {
 });
 
 test('stage 4: exStore<Profile> with immerUpdate', () => {
-	// const profile = exStore<Profile>({
-	// 	name: 'profile',
-	// 	initialValue: { name: 'John Doe', age: 60 }
-	// });
+	const profile = exStore<Profile>({
+		name: 'profile',
+		initialValue: { name: 'John Doe', age: 60 }
+	});
 });

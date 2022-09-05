@@ -114,4 +114,16 @@ test('stage 4: with nested object initialValue', () => {
 	expect(get(todoList)).toEqual({ todos: [{ id: 0, title: 'todo 1' }] });
 });
 
+test('stage 5: without actions', () => {
+	interface Count {
+		$initialValue: number;
+	}
 
+	// @ts-expect-error
+	const count = exStore<Count>({
+		name: 'count-test-store',
+		initialValue: 0
+	});
+
+	expect(get(count)).toBe(0);
+});
