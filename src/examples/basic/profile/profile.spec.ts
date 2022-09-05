@@ -15,10 +15,9 @@ test('change profile name.', () => {
 		initialValue: { name: 'John Doe', age: 60 },
 		actions: (update) => ({
 			changeName(name: string) {
-				update((state) => ({
-					...state,
-					name
-				}));
+				update((state) => {
+					state.name = name;
+				});
 			}
 		})
 	});
@@ -27,6 +26,8 @@ test('change profile name.', () => {
 
 	expect(get(profile).name).toBe('Sam Wilson');
 	expect(get(profile).age).toBe(60);
+
+	console.log(get(profile));
 });
 
 test('render <Profile /> and bind input with store.', async () => {

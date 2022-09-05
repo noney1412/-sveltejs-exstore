@@ -1,12 +1,12 @@
-import type { Writable } from 'svelte/store';
 import type { ExSlice } from './ExSlice';
+import type { WithImmerUpdater } from './ExUpdater';
 import type { OnlyFunc } from './utils';
 
 /**
  * ExStore is redux-like store.
  * @typeParam State - initial value.
  */
-export type ExStore<State> = Writable<ExSlice<State>['initialValue']> & OnlyFunc<State>;
+export type ExStore<State> = WithImmerUpdater<ExSlice<State>['initialValue']> & OnlyFunc<State>;
 
 /**
  * Create a single store.

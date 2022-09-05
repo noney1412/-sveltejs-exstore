@@ -1,12 +1,13 @@
+import exStore from '$lib';
 import produce from 'immer';
-import { get, writable } from 'svelte/store';
+import { get, Subscriber, Unsubscriber, Writable, writable } from 'svelte/store';
 
 interface Profile {
 	name: string;
 	age: number;
 }
 
-test('update profile state before immer.', () => {
+test('stage 1: update profile state before immer.', () => {
 	const profile = writable<Profile>({
 		name: 'John Doe',
 		age: 60
@@ -21,9 +22,10 @@ test('update profile state before immer.', () => {
 		name: 'Sam Wilson'
 	});
 
-	console.log('without immer', get(profile));
+	expect(get(profile).name).toBe('Sam Wilson');
+	expect(get(profile).age).toBe(60);
 });
-test('update profile state with immer', () => {
+test('stage 2: update profile state with immer', () => {
 	const profile = writable<Profile>({
 		name: 'John Doe',
 		age: 60
@@ -37,5 +39,36 @@ test('update profile state with immer', () => {
 		return produce(state, pass);
 	});
 
-	console.log('with immer', get(profile));
+	expect(get(profile).name).toBe('Sam Wilson');
+});
+
+test('stage 3: with immer and custom writable<Profile>', () => {
+	interface WithImmerUpdater<State> extends Writable<State> {
+		update: (updater: (state: State) => void) => void;
+	}
+
+	const store = writable<Profile>({ name: 'John Doe', age: 20 } as Profile);
+
+	const immerStore: WithImmerUpdater<Profile> = {
+		update: (updater) => {
+			store.update((state) => {
+				return produce(state, updater);
+			});
+		},
+		set: store.set,
+		subscribe: store.subscribe
+	};
+
+	immerStore.update((state) => {
+		state.name = 'Sam Wilson';
+	});
+
+	expect(get(immerStore).name).toBe('Sam Wilson');
+});
+
+test('stage 4: exStore<Profile> with immerUpdate', () => {
+	// const profile = exStore<Profile>({
+	// 	name: 'profile',
+	// 	initialValue: { name: 'John Doe', age: 60 }
+	// });
 });

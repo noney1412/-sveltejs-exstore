@@ -1,20 +1,28 @@
+import produce from 'immer';
 import { writable } from 'svelte/store';
 import type { ExSlice } from './types/ExSlice';
 import type { CreateExStore } from './types/ExStore';
+import type { WithImmerUpdater } from './types/ExUpdater';
 
 const exStore: CreateExStore = <State>(slice: ExSlice<State>) => {
-	const { subscribe, update, set } = writable<typeof slice['initialValue']>(slice.initialValue);
+	type InitialValue = typeof slice['initialValue'];
 
-	const actions = slice.actions(update, set, subscribe);
+	const { subscribe, update, set } = writable<InitialValue>(slice.initialValue);
 
-	const store = {
+	const withImmerUpdate: WithImmerUpdater<InitialValue>['update'] = (updater) => {
+		update((state) => {
+			return produce(state, updater);
+		});
+	};
+
+	const actions = slice.actions(withImmerUpdate, set, subscribe);
+
+	return {
 		subscribe,
-		update,
+		update: withImmerUpdate,
 		set,
 		...actions
 	};
-
-	return store;
 };
 
 export default exStore;
