@@ -1,15 +1,12 @@
 /* eslint-disable prefer-const */
 import type { InitialValue } from '$lib/types/ExSlice';
-import type { WithImmerUpdater } from '$lib/types/ExUpdater';
-import type { OnlyFunc, ExtractFunctionFromObject, AnyVoidFunction } from '$lib/types/utils';
-import { get, writable, Writable } from 'svelte/store';
+import type { OnlyFunc, OnlyPrimitive } from '$lib/types/utils';
+import { get, writable } from 'svelte/store';
 
 export type ExSlice<State> = {
 	name: string;
-
 	initialValue: InitialValue<State>;
-
-	actions: (state: InitialValue<State>) => OnlyFunc<State>;
+	actions?: (state: InitialValue<State>) => OnlyFunc<State>;
 };
 
 function exStore<State>(slice: ExSlice<State>) {
@@ -19,7 +16,7 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
 
-	let actions = slice.actions(initialValue) as WrappedActions;
+	let actions = slice.actions?.(initialValue) as WrappedActions;
 
 	console.log(actions);
 
@@ -41,15 +38,20 @@ test('new action api', () => {
 	interface Profile {
 		name: string;
 		age: number;
-		changeName: (name: string) => void;
+		changeName(name: string): void;
+		changeProfile(profile: { name: string; age: number }): void;
 	}
 
 	const profile = exStore<Profile>({
 		name: 'profile-test-store',
-		initialValue: { name: 'john doe', age: 20 },
+		initialValue: {} as Profile,
 		actions: (state) => ({
 			changeName(name: string) {
 				state.name = name;
+			},
+			changeProfile(profile) {
+				state.name = profile.name;
+				state.age = profile.age;
 			}
 		})
 	});
@@ -62,6 +64,8 @@ test('new action api', () => {
 	profile.changeName('xxx');
 	profile.changeName('yyy');
 	profile.changeName('zzz');
+
+	profile.changeProfile({ name: 'hello', age: 10 });
 
 	console.log(get(profile));
 });
