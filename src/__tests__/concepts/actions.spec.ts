@@ -1,6 +1,7 @@
+/* eslint-disable prefer-const */
 import type { InitialValue } from '$lib/types/ExSlice';
 import type { WithImmerUpdater } from '$lib/types/ExUpdater';
-import type { OnlyFunc } from '$lib/types/utils';
+import type { OnlyFunc, ExtractFunctionFromObject, AnyVoidFunction } from '$lib/types/utils';
 import { get, writable, Writable } from 'svelte/store';
 
 export type ExSlice<State> = {
@@ -16,9 +17,22 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	const { subscribe, update, set } = writable<InitialValue<State>>(initialValue);
 
-	const actions = slice.actions(initialValue);
+	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
+
+	let actions = slice.actions(initialValue) as WrappedActions;
 
 	console.log(actions);
+
+	for (const [key, value] of Object.entries(actions)) {
+		const fn = value as any;
+		actions[key as keyof WrappedActions] = function (...args: unknown[]) {
+			console.log(`${slice.name}/${key}`, args);
+			update((state) => {
+				fn(...args);
+				return state;
+			});
+		};
+	}
 
 	return { subscribe, update, set, ...actions };
 }
@@ -41,7 +55,7 @@ test('new action api', () => {
 	});
 
 	profile.subscribe((profile) => {
-		console.log(profile);
+		console.log('from subscribe', profile);
 	});
 
 	profile.changeName('hello');
@@ -73,4 +87,35 @@ test('with profile ', () => {
 		profile.name = '3';
 		return profile;
 	});
+});
+
+test('wrap action', () => {
+	interface Actions {
+		changeName: (name: string) => void;
+		increaseAge: () => void;
+	}
+
+	const actions: Actions = {
+		changeName: function (name: string): void {
+			console.log('change name actions', name);
+		},
+		increaseAge: function (): void {
+			console.log('increase age action');
+		}
+	};
+
+	let newActions: Actions = {} as Actions;
+
+	for (const [key, value] of Object.entries(actions)) {
+		const fn = value;
+		newActions[key as keyof Actions] = function (...args: unknown[]) {
+			console.log('before', key);
+			fn(...args);
+			console.log('after', key);
+		};
+	}
+
+	newActions.changeName('hello');
+
+	// 1. have to know Actions type
 });
