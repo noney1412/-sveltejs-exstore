@@ -1,28 +1,38 @@
-import produce from 'immer';
-import { writable } from 'svelte/store';
-import type { ExSlice } from './types/ExSlice';
-import type { CreateExStore } from './types/ExStore';
-import type { WithImmerUpdater } from './types/ExUpdater';
+import { get, writable } from 'svelte/store';
+import type { ExSlice, InitialValue } from './types/ExSlice';
+import type { OnlyFunc } from './types/utils';
 
-const exStore: CreateExStore = <State>(slice: ExSlice<State>) => {
-	type InitialValue = typeof slice['initialValue'];
+function exStore<State>(slice: ExSlice<State>) {
+	const initialValue = slice.initialValue;
 
-	const { subscribe, update, set } = writable<InitialValue>(slice.initialValue);
+	const store = writable<InitialValue<State>>(initialValue);
+	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
 
-	const withImmerUpdate: WithImmerUpdater<InitialValue>['update'] = (updater) => {
-		update((state) => {
-			return produce(state, updater);
-		});
-	};
+	const actions = slice.actions?.(initialValue, store.update) as WrappedActions;
 
-	const actions = slice.actions(withImmerUpdate, set, subscribe);
+	if (actions !== undefined) {
+		if (initialValue !== Object(initialValue)) {
+			for (const key in actions) {
+				const fn = actions[key] as any;
+				actions[key as keyof WrappedActions] = function (...args: unknown[]) {
+					const result = fn(...args);
+					return result;
+				};
+			}
+		} else {
+			for (const key in actions) {
+				const fn = actions[key] as any;
+				actions[key as keyof WrappedActions] = function (...args: unknown[]) {
+					store.update((state) => {
+						fn(...args);
+						return state;
+					});
+				};
+			}
+		}
+	}
 
-	return {
-		subscribe,
-		update: withImmerUpdate,
-		set,
-		...actions
-	};
-};
+	return { subscribe: store.subscribe, update: store.update, set: store.set, ...actions };
+}
 
 export default exStore;

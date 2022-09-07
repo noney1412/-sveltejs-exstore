@@ -9,12 +9,9 @@ export interface Profile {
 export const profile = exStore<Profile>({
 	name: 'profile-test-store',
 	initialValue: {} as Profile,
-	actions: (update) => ({
+	actions: (state) => ({
 		changeName(name: string) {
-			update((state) => ({
-				...state,
-				name
-			}));
+			state.name = name;
 		}
 	})
 });

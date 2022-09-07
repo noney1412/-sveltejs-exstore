@@ -10,12 +10,14 @@ export interface Count {
 export const count = exStore<Count>({
 	name: 'count',
 	initialValue: 0,
-	actions: (update, set) => ({
-		increase: () => update((state) => state + 1),
-		increaseBy: (by) => update((state) => state + by),
-		decrease: () => update((state) => state - 1),
+	actions: (state, update) => ({
+		increase: () => {
+			update((state) => state + 1);
+		},
+		increaseBy: (by) => state + by,
+		decrease: () => state - 1,
 		reset() {
-			set(0);
+			0;
 		}
 	})
 });

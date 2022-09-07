@@ -11,6 +11,7 @@
 		"strict": true,
 		"noImplicitAny": true,
 		"isolatedModules": false,
+		"suppressImplicitAnyIndexErrors": false,
 		"types": [
 			"vitest/globals",
 			"@testing-library/jest-dom"
