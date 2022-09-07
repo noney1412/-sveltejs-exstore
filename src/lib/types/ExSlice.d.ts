@@ -24,5 +24,5 @@ export type ExSlice<State> = {
 	 * The actions is the function that contains all the actions in the store.
 	 * - the type specify by from only the function types of the State.
 	 */
-	actions?: (state: InitialValue<State>) => OnlyFunc<State>;
+	actions?: (state: InitialValue<State>, update: Writable<InitialValue<State>>['update']) => OnlyFunc<State>;
 };
