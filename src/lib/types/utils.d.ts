@@ -1,10 +1,12 @@
+export type Nullable<T> = T | undefined | null;
+
 export type AnyVoidFunction = (...args: never[]) => void;
 
 /**
  * Extract function from object.
  */
 export type ExtractFunctionFromObject<Props> = {
-	[Key in keyof Props]: Props[Key] extends AnyVoidFunction ? Key : never;
+	[Key in keyof Props]: Props[Key] extends AnyVoidFunction ? Key : Props;
 }[keyof Props];
 
 /**

@@ -1,20 +1,29 @@
 import { writable } from 'svelte/store';
-import type { ExSlice } from './types/ExSlice';
-import type { CreateExStore } from './types/ExStore';
+import type { ExSlice, InitialValue } from './types/ExSlice';
+import type { OnlyFunc } from './types/utils';
 
-const exStore: CreateExStore = <State>(slice: ExSlice<State>) => {
-	const { subscribe, update, set } = writable<typeof slice['initialValue']>(slice.initialValue);
+function exStore<State>(slice: ExSlice<State>) {
+	const initialValue = slice.initialValue;
 
-	const actions = slice.actions(update, set, subscribe);
+	const { subscribe, update, set } = writable<InitialValue<State>>(initialValue);
 
-	const store = {
-		subscribe,
-		update,
-		set,
-		...actions
-	};
+	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
 
-	return store;
-};
+	const actions = slice.actions?.(initialValue) as WrappedActions;
+
+	// can't use Object.entries() if primitive initialValue
+	if (actions !== undefined) {
+		for (const key in actions) {
+			const fn = actions[key] as any;
+			actions[key as keyof WrappedActions] = function (...args: unknown[]) {
+				update((state) => {
+					return fn(...args) ?? state;
+				});
+			};
+		}
+	}
+
+	return { subscribe, update, set, ...actions };
+}
 
 export default exStore;
