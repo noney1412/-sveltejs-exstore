@@ -12,7 +12,7 @@ test('stage 1: with primitive initialValue', () => {
 		initialValue: 0,
 		actions: (state) => ({
 			increase() {
-				state + 1;
+				return state + 1;
 			}
 		})
 	});
