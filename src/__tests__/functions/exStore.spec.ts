@@ -10,9 +10,9 @@ test('stage 1: with primitive initialValue', () => {
 	const count = exStore<Count>({
 		name: 'count-test-store',
 		initialValue: 0,
-		actions: (update) => ({
+		actions: (state) => ({
 			increase() {
-				update((state) => state + 1);
+				state + 1;
 			}
 		})
 	});
@@ -34,11 +34,9 @@ test('stage 2: with object initialValue', () => {
 	const profile = exStore<Profile>({
 		name: 'profile-test-store',
 		initialValue: {} as Profile,
-		actions: (update) => ({
+		actions: (state) => ({
 			changeName(name: string) {
-				update((state) => {
-					state.name = name;
-				});
+				state.name = name;
 			}
 		})
 	});
@@ -64,11 +62,9 @@ test('stage 3: with array initialValue', () => {
 	const todoList = exStore<TodoList>({
 		name: 'todo-list-test-store',
 		initialValue: [] as Todo[],
-		actions: (update) => ({
+		actions: (state) => ({
 			addTodo(todo: Todo) {
-				update((state) => {
-					state.push(todo);
-				});
+				state.push(todo);
 			}
 		})
 	});
@@ -98,11 +94,9 @@ test('stage 4: with nested object initialValue', () => {
 		initialValue: {
 			todos: [] as Todo[]
 		},
-		actions: (update) => ({
+		actions: (state) => ({
 			addTodo(todo: Todo) {
-				update((state) => {
-					state.todos.push(todo);
-				});
+				state.todos.push(todo);
 			}
 		})
 	});
@@ -119,7 +113,6 @@ test('stage 5: without actions', () => {
 		$initialValue: number;
 	}
 
-	// @ts-expect-error
 	const count = exStore<Count>({
 		name: 'count-test-store',
 		initialValue: 0

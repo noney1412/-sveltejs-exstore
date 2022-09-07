@@ -1,5 +1,3 @@
-import type { Writable } from 'svelte/store';
-import type { WithImmerUpdater } from './ExUpdater';
 import type { OnlyFunc, OnlyPrimitive } from './utils';
 
 /**
@@ -18,16 +16,12 @@ export type ExSlice<State> = {
 	name: string;
 	/**
 	 * The initial value of State.
-	 * - extract only the primitive types of the State.
+	 * - the type specify by only the primitive types of the State.
 	 */
 	initialValue: InitialValue<State>;
 	/**
-	 * The actions is the function that contains all the actions of the store.
-	 * - extract only the function types of the State.
+	 * The actions is the function that contains all the actions in the store.
+	 * - the type specify by from only the function types of the State.
 	 */
-	actions: (
-		update: WithImmerUpdater<InitialValue<State>>['update'],
-		set: Writable<InitialValue<State>>['set'],
-		subscribe: Writable<InitialValue<State>>['subscribe']
-	) => OnlyFunc<State>;
+	actions?: (state: InitialValue<State>) => OnlyFunc<State>;
 };
