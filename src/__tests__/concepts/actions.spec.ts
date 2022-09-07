@@ -18,8 +18,6 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	let actions = slice.actions?.(initialValue) as WrappedActions;
 
-	console.log(actions);
-
 	for (const [key, value] of Object.entries(actions)) {
 		const fn = value as any;
 		actions[key as keyof WrappedActions] = function (...args: unknown[]) {
@@ -40,6 +38,7 @@ test('new action api', () => {
 		age: number;
 		changeName(name: string): void;
 		changeProfile(profile: { name: string; age: number }): void;
+		changeAge(age: number): void;
 	}
 
 	const profile = exStore<Profile>({
@@ -52,74 +51,26 @@ test('new action api', () => {
 			changeProfile(profile) {
 				state.name = profile.name;
 				state.age = profile.age;
+			},
+			changeAge(age) {
+				state.age = age;
 			}
 		})
 	});
 
-	profile.subscribe((profile) => {
-		console.log('from subscribe', profile);
-	});
-
-	profile.changeName('hello');
 	profile.changeName('xxx');
 	profile.changeName('yyy');
 	profile.changeName('zzz');
 
+	expect(get(profile).name).toBe('zzz');
+	expect(get(profile).age).toBe(undefined);
+
 	profile.changeProfile({ name: 'hello', age: 10 });
 
-	console.log(get(profile));
-});
+	expect(get(profile).name).toBe('hello');
+	expect(get(profile).age).toBe(10);
 
-test('with profile ', () => {
-	const profile = writable({ name: 'with profile name', age: 30 });
+	profile.changeAge(20);
 
-	profile.subscribe((profile) => {
-		console.log('normal profile', profile);
-	});
-
-	profile.update((profile) => {
-		profile.name = 'hello';
-		return profile;
-	});
-
-	profile.update((profile) => {
-		profile.name = 'lol';
-		return profile;
-	});
-
-	profile.update((profile) => {
-		profile.name = '3';
-		return profile;
-	});
-});
-
-test('wrap action', () => {
-	interface Actions {
-		changeName: (name: string) => void;
-		increaseAge: () => void;
-	}
-
-	const actions: Actions = {
-		changeName: function (name: string): void {
-			console.log('change name actions', name);
-		},
-		increaseAge: function (): void {
-			console.log('increase age action');
-		}
-	};
-
-	let newActions: Actions = {} as Actions;
-
-	for (const [key, value] of Object.entries(actions)) {
-		const fn = value;
-		newActions[key as keyof Actions] = function (...args: unknown[]) {
-			console.log('before', key);
-			fn(...args);
-			console.log('after', key);
-		};
-	}
-
-	newActions.changeName('hello');
-
-	// 1. have to know Actions type
+	expect(get(profile).age).toBe(20);
 });
