@@ -13,11 +13,9 @@ test('change profile name.', () => {
 	const profile = exStore<Profile>({
 		name: 'profile-test-store',
 		initialValue: { name: 'John Doe', age: 60 },
-		actions: (update) => ({
+		actions: (state) => ({
 			changeName(name: string) {
-				update((state) => {
-					state.name = name;
-				});
+				state.name = name;
 			}
 		})
 	});
