@@ -10,10 +10,12 @@ test('stage 1: with primitive initialValue', () => {
 	const count = exStore<Count>({
 		name: 'count-test-store',
 		initialValue: 0,
-		actions: (state, update) => ({
-			increase: () => update((state) => state + 1)
+		actions: (state) => ({
+			increase: () => state.current + 1
 		})
 	});
+
+	console.log(get(count));
 
 	expect(get(count)).toBe(0);
 

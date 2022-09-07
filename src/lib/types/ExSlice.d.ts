@@ -7,6 +7,16 @@ import type { OnlyFunc, OnlyPrimitive } from './utils';
 type InitialValue<State> = State extends { $initialValue: infer T } ? T : OnlyPrimitive<State>;
 
 /**
+ * State of the store passed to actions by reference to handle the primitive types.
+ * if T is Object then { current: InitialValue<State> } else InitialValue<State>
+ */
+export type ExState<State> = State extends infer T
+	? T extends Record<string, unknown>
+		? InitialValue<State>
+		: { current: InitialValue<State> }
+	: never;
+
+/**
  * ExSlice is the object to init ExStore.
  * @typeParam State - initial value.
  */
@@ -24,5 +34,8 @@ export type ExSlice<State> = {
 	 * The actions is the function that contains all the actions in the store.
 	 * - the type specify by from only the function types of the State.
 	 */
-	actions?: (state: InitialValue<State>, update: Writable<InitialValue<State>>['update']) => OnlyFunc<State>;
+	actions?: (
+		state: ExState<State>,
+		update: Writable<InitialValue<State>>['update']
+	) => OnlyFunc<State>;
 };
