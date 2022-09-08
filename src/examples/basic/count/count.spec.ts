@@ -12,8 +12,8 @@ test('increase the number', () => {
 	const count = exStore<Count>({
 		name: 'count',
 		initialValue: 0,
-		actions: (state, update) => ({
-			increase: () => update((state) => state + 1)
+		actions: (state) => ({
+			increase: () => state.current + 1
 		})
 	});
 
@@ -26,7 +26,6 @@ test('increase the number', () => {
 
 test('render <Count /> and fire click & input events.', async () => {
 	render(Count);
-	screen.logTestingPlaygroundURL();
 
 	const number = screen.getByRole('heading', {
 		name: /0/i

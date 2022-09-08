@@ -6,7 +6,6 @@ function exStore<State>(slice: ExSlice<State>) {
 	const { initialValue } = slice;
 
 	const store = writable<InitialValue<State>>(initialValue);
-	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
 
 	let state: ExState<State> = {} as ExState<State>;
 
@@ -18,18 +17,23 @@ function exStore<State>(slice: ExSlice<State>) {
 		} as ExState<State>;
 	}
 
-	const actions = slice.actions?.(state, store.update) as WrappedActions;
+	type WrappedActions = OnlyFunc<State> & {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		[key: string]: any;
+	};
+
+	const actions = slice.actions?.(state) as WrappedActions;
 
 	if (actions && actions instanceof Object) {
 		for (const key in actions) {
-			const fn = actions[key] as any;
+			const fn = actions[key] as (...args: unknown[]) => void | InitialValue<State>;
 			actions[key as keyof WrappedActions] = function (...args: unknown[]) {
 				store.update((current) => {
 					if (current instanceof Object) {
 						fn(...args);
 						return current;
 					} else {
-						state.current = fn(...args);
+						state.current = fn(...args) as InitialValue<State>;
 						return state.current ?? current;
 					}
 				});

@@ -1,5 +1,5 @@
 import exStore from '$lib';
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 
 test('stage 1: with primitive initialValue', () => {
 	interface Count {
@@ -230,6 +230,8 @@ test('stage 6: subscription of the primitive type', () => {
 	count.increaseBy(2);
 
 	expect(get(count)).toBe(3);
+
+	unsubscribe();
 });
 
 test('stage 7: subscription of the reference type', () => {

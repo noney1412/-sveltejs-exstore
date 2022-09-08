@@ -59,4 +59,3 @@ vi.mock('$app/env', async () => {
 		prerendering
 	};
 });
-

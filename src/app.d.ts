@@ -23,10 +23,6 @@ interface ImportMeta {
 }
 
 declare namespace svelte.JSX {
-	interface HTMLAttributes<T> {
-		onintersect?: () => void;
-	}
-
 	export declare type UtilityNames =
 		| 'p'
 		| 'm'

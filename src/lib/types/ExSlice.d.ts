@@ -1,4 +1,3 @@
-import type { Writable } from 'svelte/store';
 import type { OnlyFunc, OnlyPrimitive } from './utils';
 
 /**
@@ -34,8 +33,5 @@ export type ExSlice<State> = {
 	 * The actions is the function that contains all the actions in the store.
 	 * - the type specify by from only the function types of the State.
 	 */
-	actions?: (
-		state: ExState<State>,
-		update: Writable<InitialValue<State>>['update']
-	) => OnlyFunc<State>;
+	actions?: (state: ExState<State>) => OnlyFunc<State>;
 };

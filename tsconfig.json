@@ -12,29 +12,14 @@
 		"noImplicitAny": true,
 		"isolatedModules": false,
 		"suppressImplicitAnyIndexErrors": false,
-		"types": [
-			"vitest/globals",
-			"@testing-library/jest-dom"
-		],
+		"types": ["vitest/globals", "@testing-library/jest-dom"],
 		"paths": {
-			"$examples": [
-				"src/examples"
-			],
-			"$examples/*": [
-				"src/examples/*"
-			],
-			"$lib": [
-				"src/lib"
-			],
-			"$lib/*": [
-				"src/lib/*"
-			],
-			"$routes": [
-				"src/routes"
-			],
-			"$routes/*": [
-				"src/routes/*"
-			]
+			"$examples": ["src/examples"],
+			"$examples/*": ["src/examples/*"],
+			"$lib": ["src/lib"],
+			"$lib/*": ["src/lib/*"],
+			"$routes": ["src/routes"],
+			"$routes/*": ["src/routes/*"]
 		}
 	}
 }
