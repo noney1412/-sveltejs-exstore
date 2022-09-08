@@ -229,9 +229,7 @@ test('stage 6: subscription of the primitive type', () => {
 
 	count.increaseBy(2);
 
-	console.log(get(count));
-
-	// expect(get(count)).toBe(3);
+	expect(get(count)).toBe(3);
 });
 
 test('stage 7: subscription of the reference type', () => {

@@ -30,9 +30,6 @@ function exStore<State>(slice: ExSlice<State>) {
 						return current;
 					} else {
 						state.current = fn(...args);
-						console.log('what is the current', current);
-						console.log('what is the current state', state);
-						// if return undefiened then not return
 						return state.current ?? current;
 					}
 				});
