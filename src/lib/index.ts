@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
 import type { OnlyFunc } from './types/utils';
 
@@ -18,7 +18,14 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	const actions = slice.actions?.(state) as WrappedActions;
 
-	wrapAction();
+	const middlewareObject = {
+		previousState: null as InitialValue<State>,
+		currentState: null as InitialValue<State>,
+		currentAction: ''
+	};
+
+	executeAction();
+	applyMiddleware();
 
 	return { subscribe: store.subscribe, update: store.update, set: store.set, ...actions };
 
@@ -45,24 +52,47 @@ function exStore<State>(slice: ExSlice<State>) {
 	 * (only primitive type) state.current will be updated with the returned value.
 	 * (reference type) no value returned. state will be updated within the actions.
 	 */
-	function wrapAction() {
+	function executeAction() {
 		if (actions && actions instanceof Object) {
 			for (const key in actions) {
 				const fn = actions[key] as (...args: unknown[]) => void | InitialValue<State>;
 				actions[key as keyof WrappedActions] = function (...args: unknown[]) {
 					// actions is called here
-					store.update((current) => {
-						if (current instanceof Object) {
-							fn(...args);
-							return current;
-						} else {
-							state.current = fn(...args) as InitialValue<State>;
-							return state.current ?? current;
-						}
-					});
+					beforeUpdateState();
+					updateState();
+					afterUpdateState();
+
+					function beforeUpdateState() {
+						middlewareObject.previousState = get(store);
+					}
+
+					function updateState() {
+						debugger;
+						store.update((current) => {
+							if (current instanceof Object) {
+								fn(...args);
+								// the current is here (reference type)
+								return current;
+							} else {
+								state.current = fn(...args) as InitialValue<State>;
+								// the current is here (primitive type)
+								return state.current ?? current;
+							}
+						});
+					}
+
+					function afterUpdateState() {
+						middlewareObject.currentAction = key;
+						middlewareObject.currentState = get(store);
+						debugger;
+					}
 				};
 			}
 		}
+	}
+
+	function applyMiddleware() {
+		// TODO
 	}
 }
 
