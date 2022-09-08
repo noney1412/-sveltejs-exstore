@@ -12,8 +12,8 @@ test('increase the number', () => {
 	const count = exStore<Count>({
 		name: 'count',
 		initialValue: 0,
-		actions: (state) => ({
-			increase: () => state + 1
+		actions: (state, update) => ({
+			increase: () => update((state) => state + 1)
 		})
 	});
 

@@ -1,34 +1,42 @@
-import { get, writable } from 'svelte/store';
-import type { ExSlice, InitialValue } from './types/ExSlice';
+import { writable } from 'svelte/store';
+import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
 import type { OnlyFunc } from './types/utils';
 
 function exStore<State>(slice: ExSlice<State>) {
-	const initialValue = slice.initialValue;
+	const { initialValue } = slice;
 
 	const store = writable<InitialValue<State>>(initialValue);
 	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
 
-	const actions = slice.actions?.(initialValue, store.update) as WrappedActions;
+	let state: ExState<State> = {} as ExState<State>;
 
-	if (actions !== undefined) {
-		if (initialValue !== Object(initialValue)) {
-			for (const key in actions) {
-				const fn = actions[key] as any;
-				actions[key as keyof WrappedActions] = function (...args: unknown[]) {
-					const result = fn(...args);
-					return result;
-				};
-			}
-		} else {
-			for (const key in actions) {
-				const fn = actions[key] as any;
-				actions[key as keyof WrappedActions] = function (...args: unknown[]) {
-					store.update((state) => {
+	if (initialValue instanceof Object) {
+		state = initialValue as ExState<State>;
+	} else {
+		state = {
+			current: initialValue
+		} as ExState<State>;
+	}
+
+	const actions = slice.actions?.(state, store.update) as WrappedActions;
+
+	if (actions && actions instanceof Object) {
+		for (const key in actions) {
+			const fn = actions[key] as any;
+			actions[key as keyof WrappedActions] = function (...args: unknown[]) {
+				store.update((current) => {
+					if (current instanceof Object) {
 						fn(...args);
-						return state;
-					});
-				};
-			}
+						return current;
+					} else {
+						state.current = fn(...args);
+						console.log('what is the current', current);
+						console.log('what is the current state', state);
+						// if return undefiened then not return
+						return state.current ?? current;
+					}
+				});
+			};
 		}
 	}
 
