@@ -8,7 +8,7 @@ function exStore<State>(slice: ExSlice<State>) {
 	const store = writable<InitialValue<State>>(initialValue);
 	type WrappedActions = OnlyFunc<State> & { [key: string]: any };
 
-	let state: ExState<State>;
+	let state: ExState<State> = {} as ExState<State>;
 
 	if (initialValue instanceof Object) {
 		state = initialValue as ExState<State>;
@@ -24,10 +24,17 @@ function exStore<State>(slice: ExSlice<State>) {
 		for (const key in actions) {
 			const fn = actions[key] as any;
 			actions[key as keyof WrappedActions] = function (...args: unknown[]) {
-				store.update((state) => {
-					const result = fn(...args);
-					console.log('what is the result from actions?', result);
-					return result ?? state;
+				store.update((current) => {
+					if (current instanceof Object) {
+						fn(...args);
+						return current;
+					} else {
+						state.current = fn(...args);
+						console.log('what is the current', current);
+						console.log('what is the current state', state);
+						// if return undefiened then not return
+						return state.current ?? current;
+					}
 				});
 			};
 		}

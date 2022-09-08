@@ -10,8 +10,8 @@ type InitialValue<State> = State extends { $initialValue: infer T } ? T : OnlyPr
  * State of the store passed to actions by reference to handle the primitive types.
  * if T is Object then { current: InitialValue<State> } else InitialValue<State>
  */
-export type ExState<State> = State extends infer T
-	? T extends Record<string, unknown>
+export type ExState<State> = InitialValue<State> extends infer T
+	? T extends Record<string, unknown> | Array<unknown>
 		? InitialValue<State>
 		: { current: InitialValue<State> }
 	: never;
