@@ -1,72 +1,81 @@
 import { browser, dev } from '$app/environment';
+import type { MiddlewareObject } from '$lib/types/ExMiddleware';
 import type { Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 
 interface WithReduxDevtoolsOption {
+	/**
+	 * The name of the action to be displayed in the Redux DevTools.
+	 */
 	name?: string;
+	/**
+	 * The latency of the action to be displayed in the Redux DevTools.
+	 * @default 100
+	 */
 	latency?: number;
 }
 
-function withReduxDevtools<T = any>(
-	store: Writable<T>,
+function initDevtools(options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }) {
+	if (!browser && !dev) return undefined;
+	if (!(typeof window !== 'undefined' && window)) return undefined;
+
+	const devTools =
+		(window as any).window.__REDUX_DEVTOOLS_EXTENSION__ &&
+		(window as any).__REDUX_DEVTOOLS_EXTENSION__.connect(options);
+
+	return devTools;
+}
+
+function withReduxDevtools<State>(
+	middlewareObject: MiddlewareObject<State>,
 	options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }
 ) {
-	if (process.env.NODE_ENV !== 'production' && browser && dev) {
-		if (!(typeof window !== 'undefined' && window)) return;
+	// initialize Redux DevTools
 
-		const devTools =
-			(window as any).window.__REDUX_DEVTOOLS_EXTENSION__ &&
-			(window as any).__REDUX_DEVTOOLS_EXTENSION__.connect(options);
-		if (!devTools) return;
+	const devTools = initDevtools(options);
 
-		console.log('call from redux', store);
+	if (!devTools) return;
 
-		const INITIAL_STATE = Object.assign({}, get(store));
-		let currentState: T = INITIAL_STATE;
-		let commitState: T;
-		let isInJumpToActionProgress = false;
+	const { store, currentState, currentActionName, storeName } = middlewareObject;
 
-		devTools.subscribe((message: any) => {
-			console.log(message);
+	const INITIAL_STATE = get(store);
 
-			if (message.type === 'DISPATCH' && message.payload.type === 'RESET') {
-				store.set(INITIAL_STATE);
-				devTools.init(currentState);
-				commitState = INITIAL_STATE;
-			}
+	let isInJumpToActionProgress = false;
 
-			if (message.type === 'DISPATCH' && message.payload.type === 'COMMIT') {
-				devTools.init(currentState);
-				commitState = currentState;
-			}
+	devTools.subscribe((message: any) => {
+		if (message.type === 'DISPATCH' && message.payload.type === 'RESET') {
+			store.set(INITIAL_STATE);
+			devTools.init(currentState);
+		}
 
-			if (message.type === 'DISPATCH' && message.payload.type === 'ROLLBACK') {
-				store.set(commitState);
-				devTools.init(currentState);
-			}
+		if (message.type === 'DISPATCH' && message.payload.type === 'COMMIT') {
+			devTools.init(currentState);
+		}
 
-			if (
-				message.type === 'DISPATCH' &&
-				message.payload.type === 'JUMP_TO_ACTION' &&
-				message.state
-			) {
-				isInJumpToActionProgress = true;
-				const state = JSON.parse(message.state);
-				store.set(state);
-			}
-		});
+		if (message.type === 'DISPATCH' && message.payload.type === 'ROLLBACK') {
+			console.log('rollback');
+		}
 
-		devTools.init(INITIAL_STATE);
+		if (message.type === 'DISPATCH' && message.payload.type === 'JUMP_TO_ACTION' && message.state) {
+			isInJumpToActionProgress = true;
+			const state = JSON.parse(message.state);
+			store.set(state);
+		}
+	});
 
-		store.subscribe((state) => {
-			console.log('call inside redux subscribe', state, currentState);
-			currentState = state;
-			console.log('init', INITIAL_STATE);
+	devTools.init(INITIAL_STATE);
 
-			if (isInJumpToActionProgress) return;
-			devTools.send(options.name, state);
-		});
-	}
+	store.subscribe((state: any) => {
+		const name = `${storeName}/${currentActionName}`;
+		currentState;
+		state;
+		name;
+
+		debugger;
+
+		if (isInJumpToActionProgress) return;
+		devTools.send(options.name, state);
+	});
 }
 
 export default withReduxDevtools;
