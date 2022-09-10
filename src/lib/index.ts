@@ -1,11 +1,10 @@
 import { get, writable } from 'svelte/store';
+import withReduxDevtools from './middlewares/withReduxDevtools';
 import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
-import type { OnlyFunc } from './types/utils';
+import type { Nullable, OnlyFunc } from './types/utils';
 
 function exStore<State>(slice: ExSlice<State>) {
-	const { initialValue } = slice;
-
-	const store = writable<InitialValue<State>>(initialValue);
+	const store = writable<InitialValue<State>>(slice.initialValue);
 
 	let state: ExState<State> = {} as ExState<State>;
 
@@ -18,10 +17,13 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	const actions = slice.actions?.(state) as WrappedActions;
 
+	// can add middlewares store.
 	const middlewareObject = {
-		previousState: null as InitialValue<State>,
-		currentState: null as InitialValue<State>,
-		currentAction: ''
+		storeName: slice.name,
+		previousState: undefined,
+		currentState: undefined,
+		currentActionName: '',
+		store
 	};
 
 	executeAction();
@@ -37,11 +39,11 @@ function exStore<State>(slice: ExSlice<State>) {
 	 * if the initial value is a reference type, the state will be `initialValue`
 	 */
 	function defineState() {
-		if (initialValue instanceof Object) {
-			state = initialValue as ExState<State>;
+		if (slice.initialValue instanceof Object) {
+			state = slice.initialValue as ExState<State>;
 		} else {
 			state = {
-				current: initialValue
+				current: slice.initialValue
 			} as ExState<State>;
 		}
 	}
@@ -63,11 +65,10 @@ function exStore<State>(slice: ExSlice<State>) {
 					afterUpdateState();
 
 					function beforeUpdateState() {
-						middlewareObject.previousState = get(store);
+						middlewareObject.previousState = get(store) as Nullable<InitialValue<State>>;
 					}
 
 					function updateState() {
-						debugger;
 						store.update((current) => {
 							if (current instanceof Object) {
 								fn(...args);
@@ -82,9 +83,8 @@ function exStore<State>(slice: ExSlice<State>) {
 					}
 
 					function afterUpdateState() {
-						middlewareObject.currentAction = key;
-						middlewareObject.currentState = get(store);
-						debugger;
+						middlewareObject.currentActionName = key;
+						middlewareObject.currentState = get(store) as Nullable<InitialValue<State>>;
 					}
 				};
 			}
@@ -92,7 +92,7 @@ function exStore<State>(slice: ExSlice<State>) {
 	}
 
 	function applyMiddleware() {
-		// TODO
+		withReduxDevtools<InitialValue<State>>(middlewareObject);
 	}
 }
 
