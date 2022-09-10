@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { count } from './count';
-	debugger;
 </script>
 
 <div

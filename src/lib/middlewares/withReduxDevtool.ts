@@ -1,6 +1,5 @@
 import { browser, dev } from '$app/environment';
-import type { MiddlewareObject } from '$lib/types/ExMiddleware';
-import type { Writable } from 'svelte/store';
+import type { Middleware } from '$lib/types/ExMiddleware';
 import { get } from 'svelte/store';
 
 interface WithReduxDevtoolsOption {
@@ -15,7 +14,7 @@ interface WithReduxDevtoolsOption {
 	latency?: number;
 }
 
-function initDevtools(options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }) {
+function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }) {
 	if (!browser && !dev) return undefined;
 	if (!(typeof window !== 'undefined' && window)) return undefined;
 
@@ -26,13 +25,14 @@ function initDevtools(options: WithReduxDevtoolsOption = { name: 'update', laten
 	return devTools;
 }
 
-function withReduxDevtools<State>(
-	middlewareObject: MiddlewareObject<State>,
+// Trigger every time the middleware store is updated.
+function withReduxDevtool<State>(
+	middlewareObject: Middleware<State>,
 	options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }
 ) {
 	// initialize Redux DevTools
 
-	const devTools = initDevtools(options);
+	const devTools = initDevtool(options);
 
 	if (!devTools) return;
 
@@ -71,11 +71,9 @@ function withReduxDevtools<State>(
 		state;
 		name;
 
-		debugger;
-
 		if (isInJumpToActionProgress) return;
 		devTools.send(options.name, state);
 	});
 }
 
-export default withReduxDevtools;
+export default withReduxDevtool;
