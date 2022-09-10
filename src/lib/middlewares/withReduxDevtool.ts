@@ -25,6 +25,8 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latenc
 	return devTools;
 }
 
+const middlewareByName = new Map();
+
 // Trigger every time the middleware store is updated.
 function withReduxDevtool<State>(
 	middleware: Middleware<State>,
@@ -36,9 +38,21 @@ function withReduxDevtool<State>(
 
 	if (!devTools) return;
 
-	const { store, currentState, currentActionName, storeName } = middleware;
-	
-	console.log(middleware);
+	initStore();
+
+	function initStore() {
+		if (middlewareByName.has(middleware.storeName)) return;
+		middlewareByName.set(middleware.storeName, middleware);
+
+		const initialValue = {} as { [key: string]: any };
+
+		middlewareByName.forEach((middleware, name) => {
+			const { initialState } = middleware as Middleware<State>;
+			initialValue[name] = initialState;
+		});
+
+		devTools.init(initialValue);
+	}
 }
 
 export default withReduxDevtool;
