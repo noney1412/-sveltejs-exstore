@@ -13,19 +13,18 @@ function exStore<State>(slice: ExSlice<State>) {
 		[key: string]: any;
 	};
 
-	const actions = slice.actions?.(state) as WrappedAction;
+	const actions = slice.actions?.(defineState()) as WrappedAction;
 
 	// can add middlewares store.
-	const middleware: Middleware<InitialValue<State>> = {
+	const middleware = writable<Middleware<InitialValue<State>>>({
 		storeName: slice.name,
 		initialState: slice.initialValue,
 		previousState: undefined as Nullable<InitialValue<State>>,
 		currentState: undefined as Nullable<InitialValue<State>>,
 		currentActionName: '',
 		store
-	};
+	});
 
-	defineState();
 	executeAction();
 	applyMiddleware();
 
@@ -46,6 +45,8 @@ function exStore<State>(slice: ExSlice<State>) {
 				current: slice.initialValue
 			} as ExState<State>;
 		}
+
+		return state;
 	}
 
 	/**
@@ -59,13 +60,14 @@ function exStore<State>(slice: ExSlice<State>) {
 			for (const key in actions) {
 				const fn = actions[key] as (...args: unknown[]) => void | InitialValue<State>;
 				actions[key as keyof WrappedAction] = function (...args: unknown[]) {
-					// actions is called here
+					const m = get(middleware);
+
 					beforeUpdateState();
 					updateState();
 					afterUpdateState();
 
 					function beforeUpdateState() {
-						middleware.previousState = get(store) as Nullable<InitialValue<State>>;
+						m.previousState = get(store) as Nullable<InitialValue<State>>;
 					}
 
 					function updateState() {
@@ -83,8 +85,9 @@ function exStore<State>(slice: ExSlice<State>) {
 					}
 
 					function afterUpdateState() {
-						middleware.currentActionName = key;
-						middleware.currentState = get(store) as Nullable<InitialValue<State>>;
+						m.currentActionName = key;
+						m.currentState = get(store) as Nullable<InitialValue<State>>;
+						middleware.set(m);
 					}
 				};
 			}
@@ -95,7 +98,9 @@ function exStore<State>(slice: ExSlice<State>) {
 	 * subscribe the middlewaretore to apply middlewares.
 	 */
 	function applyMiddleware() {
-		withReduxDevtool<InitialValue<State>>(middleware);
+		middleware.subscribe((m) => {
+			withReduxDevtool<InitialValue<State>>(m);
+		});
 	}
 }
 

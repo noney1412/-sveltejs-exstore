@@ -27,7 +27,7 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latenc
 
 // Trigger every time the middleware store is updated.
 function withReduxDevtool<State>(
-	middlewareObject: Middleware<State>,
+	middleware: Middleware<State>,
 	options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }
 ) {
 	// initialize Redux DevTools
@@ -36,44 +36,9 @@ function withReduxDevtool<State>(
 
 	if (!devTools) return;
 
-	const { store, currentState, currentActionName, storeName } = middlewareObject;
-
-	const INITIAL_STATE = get(store);
-
-	let isInJumpToActionProgress = false;
-
-	devTools.subscribe((message: any) => {
-		if (message.type === 'DISPATCH' && message.payload.type === 'RESET') {
-			store.set(INITIAL_STATE);
-			devTools.init(currentState);
-		}
-
-		if (message.type === 'DISPATCH' && message.payload.type === 'COMMIT') {
-			devTools.init(currentState);
-		}
-
-		if (message.type === 'DISPATCH' && message.payload.type === 'ROLLBACK') {
-			console.log('rollback');
-		}
-
-		if (message.type === 'DISPATCH' && message.payload.type === 'JUMP_TO_ACTION' && message.state) {
-			isInJumpToActionProgress = true;
-			const state = JSON.parse(message.state);
-			store.set(state);
-		}
-	});
-
-	devTools.init(INITIAL_STATE);
-
-	store.subscribe((state: any) => {
-		const name = `${storeName}/${currentActionName}`;
-		currentState;
-		state;
-		name;
-
-		if (isInJumpToActionProgress) return;
-		devTools.send(options.name, state);
-	});
+	const { store, currentState, currentActionName, storeName } = middleware;
+	
+	console.log(middleware);
 }
 
 export default withReduxDevtool;
