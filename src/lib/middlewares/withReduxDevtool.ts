@@ -43,8 +43,6 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 		devTools.init(middleware.initialState);
 
-		console.log(devTools);
-
 		devTools.subscribe((message: any) => {
 			console.log(message);
 		});
@@ -58,7 +56,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 			devTools.send({ type: middleware.currentActionName }, get(middleware.store), [
 				{
-					name: 'count'
+					name: middleware.storeName
 				}
 			]);
 		}
