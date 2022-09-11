@@ -56,10 +56,14 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 		if (!root.devTool) return;
 
-		if (root.init === false) {
-			root.devTool.init({});
-			root.init = true;
-		}
+		const initialValue = {} as { [key: string]: unknown };
+
+		middlewareByName.forEach((middleware) => {
+			const m: Middleware<State> = middleware;
+			initialValue[m.storeName] = get(m.store);
+		});
+
+		root.devTool.init(initialValue);
 	}
 
 	function update() {
