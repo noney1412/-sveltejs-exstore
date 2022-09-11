@@ -1,6 +1,6 @@
-import { browser, dev } from '$app/environment';
 import type { Middleware } from '$lib/types/ExMiddleware';
 import { get } from 'svelte/store';
+import { isReadyForBrowser } from './utils';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -12,11 +12,11 @@ interface WithReduxDevtoolsOption {
 	 * @default 100
 	 */
 	latency?: number;
+	instanceId?: number;
 }
 
-function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }) {
-	if (!browser && !dev) return undefined;
-	if (!(typeof window !== 'undefined' && window)) return undefined;
+function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
+	if (!isReadyForBrowser()) return;
 
 	const devTools =
 		(window as any).window.__REDUX_DEVTOOLS_EXTENSION__ &&
@@ -25,33 +25,51 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latenc
 	return devTools;
 }
 
+function getTitle() {
+	if (!isReadyForBrowser()) return;
+
+	return window.document.title;
+}
+
+function getDevtool() {
+	if (!isReadyForBrowser()) return;
+
+	return (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+}
+
 const middlewareByName = new Map();
 
-// Trigger every time the middleware store is updated.
-function withReduxDevtool<State>(
-	middleware: Middleware<State>,
-	options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }
-) {
-	// initialize Redux DevTools
+function withReduxDevtool<State>(middleware: Middleware<State>) {
+	const root = {
+		devTool: initDevtool({ name: getTitle() ?? 'no title', instanceId: 1 }),
+		init: false
+	};
 
-	const devTools = initDevtool(options);
-
-	if (!devTools) return;
-
+	update();
 	initStore();
 
 	function initStore() {
+		if (!isReadyForBrowser()) return;
+
 		if (middlewareByName.has(middleware.storeName)) return;
 		middlewareByName.set(middleware.storeName, middleware);
 
-		const initialValue = {} as { [key: string]: any };
+		if (!root.devTool) return;
 
-		middlewareByName.forEach((middleware, name) => {
-			const { initialState } = middleware as Middleware<State>;
-			initialValue[name] = initialState;
-		});
+		if (root.init === false) {
+			root.devTool.init({});
+			root.init = true;
+		}
+	}
 
-		devTools.init(initialValue);
+	function update() {
+		if (middlewareByName.has(middleware.storeName)) {
+			const devTools = initDevtool({ name: 'count', instanceId: 1 });
+
+			if (!devTools) return;
+
+			devTools.send({ type: middleware.currentActionName }, get(middleware.store));
+		}
 	}
 }
 
