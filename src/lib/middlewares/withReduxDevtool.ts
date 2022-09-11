@@ -25,6 +25,13 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 	return devTools;
 }
 
+function getDevtool() {
+	if (!browser && !dev) return undefined;
+	if (!(typeof window !== 'undefined' && window)) return undefined;
+
+	return (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+}
+
 const middlewareByName = new Map();
 
 function withReduxDevtool<State>(middleware: Middleware<State>) {
@@ -50,9 +57,11 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 	function update() {
 		if (middlewareByName.has(middleware.storeName)) {
-			const devTools = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+			const devTools = getDevtool();
 
 			if (!devTools) return;
+
+			console.log(middleware.storeName);
 
 			devTools.send({ type: middleware.currentActionName }, get(middleware.store), [
 				{
