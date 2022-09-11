@@ -14,7 +14,7 @@ interface WithReduxDevtoolsOption {
 	latency?: number;
 }
 
-function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }) {
+function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
 	if (!browser && !dev) return undefined;
 	if (!(typeof window !== 'undefined' && window)) return undefined;
 
@@ -27,14 +27,10 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latenc
 
 const middlewareByName = new Map();
 
-// Trigger every time the middleware store is updated.
 function withReduxDevtool<State>(middleware: Middleware<State>) {
-	// initialize Redux DevTools
-
 	update();
 	initStore();
 
-	// trigger only when the store is init.
 	function initStore() {
 		if (middlewareByName.has(middleware.storeName)) return;
 		middlewareByName.set(middleware.storeName, middleware);
