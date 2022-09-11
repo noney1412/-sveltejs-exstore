@@ -1,6 +1,7 @@
 import { browser, dev } from '$app/environment';
 import type { Middleware } from '$lib/types/ExMiddleware';
 import { get } from 'svelte/store';
+import { isReadyForBrowser } from './utils';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -15,8 +16,7 @@ interface WithReduxDevtoolsOption {
 }
 
 function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
-	if (!browser && !dev) return undefined;
-	if (!(typeof window !== 'undefined' && window)) return undefined;
+	if (!isReadyForBrowser()) return;
 
 	const devTools =
 		(window as any).window.__REDUX_DEVTOOLS_EXTENSION__ &&
@@ -26,8 +26,7 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 }
 
 function getDevtool() {
-	if (!browser && !dev) return undefined;
-	if (!(typeof window !== 'undefined' && window)) return undefined;
+	if (!isReadyForBrowser()) return;
 
 	return (window as any).__REDUX_DEVTOOLS_EXTENSION__;
 }
@@ -39,11 +38,13 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 	initStore();
 
 	function initStore() {
+		if (!isReadyForBrowser()) return;
+
 		if (middlewareByName.has(middleware.storeName)) return;
 		middlewareByName.set(middleware.storeName, middleware);
 
 		const devTools = initDevtool({
-			name: middleware.storeName
+			name: 'document.title'
 		});
 
 		if (!devTools) return;
