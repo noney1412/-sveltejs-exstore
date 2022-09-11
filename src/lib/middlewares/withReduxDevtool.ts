@@ -1,6 +1,7 @@
 import type { Middleware } from '$lib/types/ExMiddleware';
 import { get } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
+import _ from 'lodash';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -22,6 +23,10 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 		(window as any).window.__REDUX_DEVTOOLS_EXTENSION__ &&
 		(window as any).__REDUX_DEVTOOLS_EXTENSION__.connect(options);
 
+	devTools.subscribe((message: any) => {
+		console.log(message);
+	});
+
 	return devTools;
 }
 
@@ -31,22 +36,17 @@ function getTitle() {
 	return window.document.title;
 }
 
-function getDevtool() {
-	if (!isReadyForBrowser()) return;
-
-	return (window as any).__REDUX_DEVTOOLS_EXTENSION__;
-}
-
 const middlewareByName = new Map();
 
-function withReduxDevtool<State>(middleware: Middleware<State>) {
-	const root = {
-		devTool: initDevtool({ name: getTitle() ?? 'no title', instanceId: 1 }),
-		init: false
-	};
+const root = {
+	devTool: initDevtool({ name: getTitle() ?? 'no title', instanceId: 1441141 }),
+	isSubscribed: false
+};
 
+function withReduxDevtool<State>(middleware: Middleware<State>) {
 	update();
 	initStore();
+	subscribeStore();
 
 	function initStore() {
 		if (!isReadyForBrowser()) return;
@@ -66,9 +66,23 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 		root.devTool.init(initialValue);
 	}
 
+	function subscribeStore() {
+		if (!isReadyForBrowser()) return;
+
+		if (root.isSubscribed) return;
+
+		if (!root.devTool) return;
+
+		root.devTool.subscribe((message: any) => {
+			console.log(message);
+		});
+
+		root.isSubscribed = true;
+	}
+
 	function update() {
 		if (middlewareByName.has(middleware.storeName)) {
-			const devTools = initDevtool({ name: 'count', instanceId: 1 });
+			const devTools = root.devTool;
 
 			if (!devTools) return;
 
