@@ -28,30 +28,44 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'update', latenc
 const middlewareByName = new Map();
 
 // Trigger every time the middleware store is updated.
-function withReduxDevtool<State>(
-	middleware: Middleware<State>,
-	options: WithReduxDevtoolsOption = { name: 'update', latency: 100 }
-) {
+function withReduxDevtool<State>(middleware: Middleware<State>) {
 	// initialize Redux DevTools
 
-	const devTools = initDevtool(options);
-
-	if (!devTools) return;
-
+	update();
 	initStore();
 
+	// trigger only when the store is init.
 	function initStore() {
 		if (middlewareByName.has(middleware.storeName)) return;
 		middlewareByName.set(middleware.storeName, middleware);
 
-		const initialValue = {} as { [key: string]: any };
-
-		middlewareByName.forEach((middleware, name) => {
-			const { initialState } = middleware as Middleware<State>;
-			initialValue[name] = initialState;
+		const devTools = initDevtool({
+			name: middleware.storeName
 		});
 
-		devTools.init(initialValue);
+		if (!devTools) return;
+
+		devTools.init(middleware.initialState);
+
+		console.log(devTools);
+
+		devTools.subscribe((message: any) => {
+			console.log(message);
+		});
+	}
+
+	function update() {
+		if (middlewareByName.has(middleware.storeName)) {
+			const devTools = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+
+			if (!devTools) return;
+
+			devTools.send({ type: middleware.currentActionName }, get(middleware.store), [
+				{
+					name: 'count'
+				}
+			]);
+		}
 	}
 }
 
