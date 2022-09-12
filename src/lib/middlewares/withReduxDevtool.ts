@@ -13,6 +13,19 @@ interface WithReduxDevtoolsOption {
 	 */
 	latency?: number;
 	instanceId?: number;
+	serialize?:
+		| boolean
+		| {
+				date?: boolean;
+				regex?: boolean;
+				undefined?: boolean;
+				error?: boolean;
+				symbol?: boolean;
+				map?: boolean;
+				set?: boolean;
+				// eslint-disable-next-line @typescript-eslint/ban-types
+				function?: boolean | Function;
+		  };
 }
 
 function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
@@ -34,7 +47,7 @@ function getTitle() {
 const middlewareByName = new Map();
 
 const root = {
-	devTool: initDevtool({ name: getTitle() ?? 'no title', instanceId: 1441141 }),
+	devTool: initDevtool({ name: getTitle() ?? 'no title', instanceId: 1441141, serialize: true }),
 	isSubscribed: false
 };
 
@@ -63,9 +76,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 	function subscribeStore() {
 		if (!isReadyForBrowser()) return;
-
 		if (root.isSubscribed) return;
-
 		if (!root.devTool) return;
 
 		root.devTool.subscribe((message: any) => {
