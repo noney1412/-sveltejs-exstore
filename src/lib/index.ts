@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store';
-import withReduxDevtool from './middlewares/withReduxDevtool';
+import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { Middleware } from './types/ExMiddleware';
 import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
 import type { Nullable, OnlyFunc } from './types/utils';
