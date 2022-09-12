@@ -113,10 +113,6 @@ function exStore<State>(slice: ExSlice<State>) {
 		}
 	}
 
-	function wrapSetAndUpdate() {
-		throw new Error('Function not implemented.');
-	}
-
 	/**
 	 * subscribe the middlewaretore to apply middlewares.
 	 */
