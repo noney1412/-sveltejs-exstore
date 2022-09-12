@@ -104,7 +104,9 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 			devTools.send(
 				{ type: `${middleware.storeName}/${middleware.currentActionName}` },
-				get(middleware.store)
+				{
+					[middleware.storeName]: get(middleware.store)
+				}
 			);
 		}
 	}
