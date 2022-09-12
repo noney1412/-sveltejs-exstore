@@ -15,7 +15,6 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	const actions = slice.actions?.(defineState()) as WrappedAction;
 
-	// can add middlewares store.
 	const middleware = writable<Middleware<InitialValue<State>>>({
 		storeName: slice.name,
 		initialState: slice.initialValue,
