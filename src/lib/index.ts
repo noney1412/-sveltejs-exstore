@@ -25,10 +25,29 @@ function exStore<State>(slice: ExSlice<State>) {
 		store
 	});
 
-	executeAction();
+	const wrapStore = {
+		set: (x: InitialValue<State>) => {
+			const m = get(middleware);
+			m.currentActionName = 'set';
+			m.previousState = get(store) as Nullable<InitialValue<State>>;
+			store.set(x);
+			m.currentState = get(store) as Nullable<InitialValue<State>>;
+			middleware.set(m);
+		},
+		update: (fn: (x: InitialValue<State>) => InitialValue<State>) => {
+			const m = get(middleware);
+			m.currentActionName = 'update';
+			m.previousState = get(store) as Nullable<InitialValue<State>>;
+			store.update(fn);
+			m.currentState = get(store) as Nullable<InitialValue<State>>;
+			middleware.set(m);
+		}
+	};
+
+	wrapAction();
 	applyMiddleware();
 
-	return { subscribe: store.subscribe, update: store.update, set: store.set, ...actions };
+	return { subscribe: store.subscribe, update: wrapStore.update, set: wrapStore.set, ...actions };
 
 	/**
 	 * Define state if the initial value is primitive or reference type
@@ -55,7 +74,7 @@ function exStore<State>(slice: ExSlice<State>) {
 	 * (only primitive type) state.current will be updated with the returned value.
 	 * (reference type) no value returned. state will be updated within the actions.
 	 */
-	function executeAction() {
+	function wrapAction() {
 		if (actions && actions instanceof Object) {
 			for (const key in actions) {
 				const fn = actions[key] as (...args: unknown[]) => void | InitialValue<State>;
@@ -92,6 +111,10 @@ function exStore<State>(slice: ExSlice<State>) {
 				};
 			}
 		}
+	}
+
+	function wrapSetAndUpdate() {
+		throw new Error('Function not implemented.');
 	}
 
 	/**
