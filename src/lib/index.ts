@@ -93,7 +93,7 @@ function exStore<State>(slice: ExSlice<State>) {
 							if (current instanceof Object) {
 								fn(...args);
 								// the current is here (reference type)
-								return current;
+								return state as InitialValue<State>;
 							} else {
 								state.current = fn(...args) as InitialValue<State>;
 								// the current is here (primitive type)

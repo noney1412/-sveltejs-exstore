@@ -1,5 +1,5 @@
 import type { Middleware } from '$lib/types/ExMiddleware';
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
 
 interface WithReduxDevtoolsOption {
@@ -27,6 +27,16 @@ interface WithReduxDevtoolsOption {
 				function?: boolean | Function;
 		  };
 }
+
+type JUMP_TO_STATE = {
+	type: 'DISPATCH';
+	payload: {
+		type: 'JUMP_TO_STATE' | 'JUMP_TO_ACTION';
+		actionId: number;
+	};
+	state: string;
+	id: string | number;
+};
 
 function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
 	if (!isReadyForBrowser()) return;
@@ -57,8 +67,7 @@ const shared = {
 		serialize: true
 	}),
 	isSubscribed: false,
-	middlewareByName: new Map(),
-	actions: writable([{ type: 'INIT', payload: {}, actionId: 0 }])
+	middlewareByName: new Map()
 };
 
 function withReduxDevtool<State>(middleware: Middleware<State>) {
@@ -81,11 +90,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 			initialValue[m.storeName] = get(m.store);
 		});
 
-		shared.actions.set([{ type: 'INIT', payload: initialValue, actionId: 0 }]);
-
 		shared.devTool.init(initialValue);
-
-		console.log('actions', get(shared.actions));
 	}
 
 	function subscribeStore() {
@@ -97,37 +102,42 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 			console.log(message);
 
 			switch (message.type) {
-				case 'DISPATCH':
+				case 'DISPATCH': {
 					switch (message.payload.type) {
 						case 'JUMP_TO_STATE':
 						case 'JUMP_TO_ACTION': {
-							const actionMessage = message.payload as {
-								type: string;
-								actionId: number;
-							};
-
-							const action = get(shared.actions)[actionMessage.actionId];
-
-							// check type
-							switch (action.type) {
-								case 'INIT': {
-									Object.entries(action.payload).forEach(([key, value]) => {
-										const m = shared.middlewareByName.get(key);
-										m.store.set(value as any);
-										console.log('what is the action', action);
-										console.log(key, value);
-										console.log('value in the store', get(m.store));
-									});
+							const m: JUMP_TO_STATE = message as JUMP_TO_STATE;
+							const state = JSON.parse(m.state);
+							switch (m.payload.actionId) {
+								case 0: {
+									if (state instanceof Object) {
+										Object.entries(state).forEach(([key, value]) => {
+											if (shared.middlewareByName.has(key)) {
+												const middleware = shared.middlewareByName.get(key);
+												middleware.store.set(value);
+											}
+										});
+									}
+									break;
+								}
+								default: {
+									console.log('default JUMP_TO_STATE message', message);
+									if (state instanceof Object) {
+										Object.entries(state).forEach(([key, value]) => {
+											if (shared.middlewareByName.has(key)) {
+												const middleware = shared.middlewareByName.get(key);
+												middleware.store.set(value);
+											}
+										});
+									}
 									break;
 								}
 							}
-
-							console.log(actionMessage);
 							break;
 						}
 					}
-
 					break;
+				}
 
 				default:
 					break;
