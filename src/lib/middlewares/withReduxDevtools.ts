@@ -1,5 +1,5 @@
 import type { Middleware } from '$lib/types/ExMiddleware';
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
 
 interface WithReduxDevtoolsOption {
@@ -50,15 +50,15 @@ function getInstanceId() {
 	return window.btoa(location.href);
 }
 
-const middlewareByName = new Map();
-
-const root = {
+const shared = {
 	devTool: initDevtool({
 		name: getTitle() ?? 'no title',
 		instanceId: getInstanceId(),
 		serialize: true
 	}),
-	isSubscribed: false
+	isSubscribed: false,
+	middlewareByName: new Map(),
+	actions: writable([{ type: 'INIT', payload: {}, actionId: 0 }])
 };
 
 function withReduxDevtool<State>(middleware: Middleware<State>) {
@@ -69,36 +69,57 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 	function initStore() {
 		if (!isReadyForBrowser()) return;
 
-		if (middlewareByName.has(middleware.storeName)) return;
-		middlewareByName.set(middleware.storeName, middleware);
+		if (shared.middlewareByName.has(middleware.storeName)) return;
+		shared.middlewareByName.set(middleware.storeName, middleware);
 
-		if (!root.devTool) return;
+		if (!shared.devTool) return;
 
 		const initialValue = {} as { [key: string]: unknown };
 
-		middlewareByName.forEach((middleware) => {
+		shared.middlewareByName.forEach((middleware) => {
 			const m: Middleware<State> = middleware;
 			initialValue[m.storeName] = get(m.store);
 		});
 
-		root.devTool.init(initialValue);
+		shared.actions.set([{ type: 'INIT', payload: initialValue, actionId: 0 }]);
+
+		shared.devTool.init(initialValue);
+
+		console.log('actions', get(shared.actions));
 	}
 
 	function subscribeStore() {
 		if (!isReadyForBrowser()) return;
-		if (root.isSubscribed) return;
-		if (!root.devTool) return;
+		if (shared.isSubscribed) return;
+		if (!shared.devTool) return;
 
-		root.devTool.subscribe((message: any) => {
+		shared.devTool.subscribe((message: any) => {
 			console.log(message);
+
+			switch (message.type) {
+				case 'DISPATCH':
+					switch (message.payload.type) {
+						case 'JUMP_TO_STATE':
+						case 'JUMP_TO_ACTION': {
+							const state = JSON.parse(message.state) as any;
+							console.log(state);
+							break;
+						}
+					}
+
+					break;
+
+				default:
+					break;
+			}
 		});
 
-		root.isSubscribed = true;
+		shared.isSubscribed = true;
 	}
 
 	function update() {
-		if (middlewareByName.has(middleware.storeName)) {
-			const devTools = root.devTool;
+		if (shared.middlewareByName.has(middleware.storeName)) {
+			const devTools = shared.devTool;
 
 			if (!devTools) return;
 
