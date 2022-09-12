@@ -13,7 +13,7 @@
 	>
 		<a href="/examples/count">count example</a>
 		<a href="/examples/profile">profile example</a>
-		<a href="/examples/devtool">devtool example</a>
+		<a href="/examples/devtools">devtools example</a>
 	</div>
 </div>
 
