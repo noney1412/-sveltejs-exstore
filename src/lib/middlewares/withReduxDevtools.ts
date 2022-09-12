@@ -121,7 +121,6 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 									break;
 								}
 								default: {
-									console.log('default JUMP_TO_STATE message', message);
 									if (state instanceof Object) {
 										Object.entries(state).forEach(([key, value]) => {
 											if (shared.middlewareByName.has(key)) {
