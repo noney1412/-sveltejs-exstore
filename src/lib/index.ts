@@ -5,7 +5,7 @@ import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
 import type { Nullable, OnlyFunc } from './types/utils';
 
 function exStore<State>(slice: ExSlice<State>) {
-	const store = writable<InitialValue<State>>(slice.initialValue);
+	const store = writable<InitialValue<State>>(slice.initialValue as InitialValue<State>);
 
 	let state: ExState<State> = {} as ExState<State>;
 	type WrappedAction = OnlyFunc<State> & {
@@ -17,7 +17,7 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	const middleware = writable<Middleware<InitialValue<State>>>({
 		storeName: slice.name,
-		initialState: slice.initialValue,
+		initialState: slice.initialValue as InitialValue<State>,
 		previousState: undefined as Nullable<InitialValue<State>>,
 		currentState: undefined as Nullable<InitialValue<State>>,
 		currentActionName: '',
@@ -25,11 +25,11 @@ function exStore<State>(slice: ExSlice<State>) {
 	});
 
 	const wrapStore = {
-		set: (x: InitialValue<State>) => {
+		set: (x: InitialValue<State> | Record<string, never>) => {
 			const m = get(middleware);
 			m.currentActionName = 'set';
 			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			store.set(x);
+			store.set(x as InitialValue<State>);
 			m.currentState = get(store) as Nullable<InitialValue<State>>;
 			middleware.set(m);
 		},

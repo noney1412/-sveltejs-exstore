@@ -101,8 +101,28 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 					switch (message.payload.type) {
 						case 'JUMP_TO_STATE':
 						case 'JUMP_TO_ACTION': {
-							const state = JSON.parse(message.state) as any;
-							console.log(state);
+							const actionMessage = message.payload as {
+								type: string;
+								actionId: number;
+							};
+
+							const action = get(shared.actions)[actionMessage.actionId];
+
+							// check type
+							switch (action.type) {
+								case 'INIT': {
+									Object.entries(action.payload).forEach(([key, value]) => {
+										const m = shared.middlewareByName.get(key);
+										m.store.set(value as any);
+										console.log('what is the action', action);
+										console.log(key, value);
+										console.log('value in the store', get(m.store));
+									});
+									break;
+								}
+							}
+
+							console.log(actionMessage);
 							break;
 						}
 					}

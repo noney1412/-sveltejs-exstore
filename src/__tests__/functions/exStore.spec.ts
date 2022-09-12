@@ -53,7 +53,7 @@ test('stage 2: with object initialValue', () => {
 
 	const profile = exStore<Profile>({
 		name: 'profile-test-store',
-		initialValue: {} as Profile,
+		initialValue: {},
 		actions: (state) => ({
 			changeName(name: string) {
 				state.name = name;
@@ -82,6 +82,10 @@ test('stage 2: with object initialValue', () => {
 	});
 
 	expect(get(profile)).toEqual({ name: 'Jack', age: 30 });
+
+	profile.set({});
+
+	expect(get(profile)).toEqual({});
 
 	unsubscribe();
 });
