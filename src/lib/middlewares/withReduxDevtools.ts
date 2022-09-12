@@ -12,7 +12,7 @@ interface WithReduxDevtoolsOption {
 	 * @default 100
 	 */
 	latency?: number;
-	instanceId?: number;
+	instanceId?: number | string;
 	serialize?:
 		| boolean
 		| {
@@ -44,10 +44,20 @@ function getTitle() {
 	return window.document.title;
 }
 
+function getInstanceId() {
+	if (!isReadyForBrowser()) return;
+
+	return window.btoa(location.href);
+}
+
 const middlewareByName = new Map();
 
 const root = {
-	devTool: initDevtool({ name: getTitle() ?? 'no title', instanceId: 1441141, serialize: true }),
+	devTool: initDevtool({
+		name: getTitle() ?? 'no title',
+		instanceId: getInstanceId(),
+		serialize: true
+	}),
 	isSubscribed: false
 };
 
