@@ -108,29 +108,13 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						case 'JUMP_TO_ACTION': {
 							const m: JUMP_TO_STATE = message as JUMP_TO_STATE;
 							const state = JSON.parse(m.state);
-							switch (m.payload.actionId) {
-								case 0: {
-									if (state instanceof Object) {
-										Object.entries(state).forEach(([key, value]) => {
-											if (shared.middlewareByName.has(key)) {
-												const middleware = shared.middlewareByName.get(key);
-												middleware.store.set(value);
-											}
-										});
+							if (state instanceof Object) {
+								Object.entries(state).forEach(([key, value]) => {
+									if (shared.middlewareByName.has(key)) {
+										const middleware = shared.middlewareByName.get(key);
+										middleware.store.set(value);
 									}
-									break;
-								}
-								default: {
-									if (state instanceof Object) {
-										Object.entries(state).forEach(([key, value]) => {
-											if (shared.middlewareByName.has(key)) {
-												const middleware = shared.middlewareByName.get(key);
-												middleware.store.set(value);
-											}
-										});
-									}
-									break;
-								}
+								});
 							}
 							break;
 						}
