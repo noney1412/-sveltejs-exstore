@@ -1,7 +1,6 @@
 import type { Middleware } from '$lib/types/ExMiddleware';
 import { get } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
-import _ from 'lodash';
 
 interface WithReduxDevtoolsOption {
 	/**
