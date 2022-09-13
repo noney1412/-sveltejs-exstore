@@ -54,21 +54,23 @@ type ROLLBACK = {
 type IMPORT_STATE = {
 	type: 'IMPORT_STATE';
 	payload: {
-		nextLiftedState: {
-			actionsById: {
-				[key: string]: {
-					action: { type: string };
-					timestamp: number;
-					type: 'PERFORM_ACTION';
-				};
-			};
-			computedStates: { state: any }[];
-			currentStateIndex: number;
-			nextActionId: number;
-			skippedActionIds: any[];
-			stagedActionIds: number[];
+		nextLiftedState: LIFTED_STATE;
+	};
+};
+
+type LIFTED_STATE = {
+	actionsById: {
+		[key: string]: {
+			action: { type: string };
+			timestamp: number;
+			type: 'PERFORM_ACTION';
 		};
 	};
+	computedStates: { state: any }[];
+	currentStateIndex: number;
+	nextActionId: number;
+	skippedActionIds: any[];
+	stagedActionIds: number[];
 };
 
 type PAUSE_RECORDING = {
@@ -239,6 +241,25 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 								shared.devTool.init(initialValue);
 							}
+							break;
+						}
+
+						case 'TOGGLE_ACTION': {
+							console.log('hello');
+
+							try {
+								const liftedState = JSON.parse(message.state);
+
+								const next: LIFTED_STATE = {
+									...liftedState,
+									skippedActionIds: [message.payload.id]
+								};
+
+								shared.devTool.send(null, next);
+							} catch (e) {
+								throw new Error('Could not parse the message state');
+							}
+
 							break;
 						}
 					}
