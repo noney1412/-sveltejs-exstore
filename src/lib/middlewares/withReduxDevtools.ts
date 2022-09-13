@@ -38,6 +38,17 @@ type JUMP_TO_STATE = {
 	id: string | number;
 };
 
+type ROLLBACK = {
+	type: string;
+	payload: {
+		type: string;
+		timestamp: number;
+	};
+	state: string;
+	id: string;
+	source: string;
+};
+
 function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
 	if (!isReadyForBrowser()) return;
 
@@ -122,7 +133,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 							break;
 						}
 						case 'RESET': {
-							const state = JSON.parse(shared.stateToBeReset as string);
+							const state = JSON.parse(shared.stateToBeReset);
 							shared.devTool.init(state);
 							Object.entries(state).forEach(([key, value]) => {
 								if (shared.middlewareByName.has(key)) {
@@ -130,6 +141,30 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 									middleware.store.set(value);
 								}
 							});
+							break;
+						}
+						case 'COMMIT': {
+							const initialValue = {} as { [key: string]: unknown };
+
+							shared.middlewareByName.forEach((middleware) => {
+								const m: Middleware<State> = middleware;
+								initialValue[m.storeName] = get(m.store);
+							});
+
+							shared.devTool.init(initialValue);
+							break;
+						}
+						case 'ROLLBACK': {
+							const m: ROLLBACK = message as ROLLBACK;
+							const state = JSON.parse(m.state);
+							Object.entries(state).forEach(([key, value]) => {
+								if (shared.middlewareByName.has(key)) {
+									const middleware = shared.middlewareByName.get(key);
+									middleware.store.set(value);
+								}
+							});
+
+							shared.devTool.init(state);
 							break;
 						}
 					}
