@@ -1,6 +1,7 @@
 import type { Middleware } from '$lib/types/ExMiddleware';
 import { get } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
+import _ from 'lodash';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -201,8 +202,23 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 						case 'IMPORT_STATE': {
 							const m: IMPORT_STATE = message as IMPORT_STATE;
+
+							const keys = Object.keys(m.payload.nextLiftedState.computedStates[0].state); // ['count', 'profile']
+
+							const currentIndex = m.payload.nextLiftedState.currentStateIndex;
+
+							const slice = _.slice(m.payload.nextLiftedState.computedStates, 1, currentIndex + 1);
+
+							keys.forEach((key) => {
+								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
+								if (shared.middlewareByName.has(key)) {
+									const middleware = shared.middlewareByName.get(key);
+									middleware.store.set(value);
+								}
+							});
+
 							shared.devTool.send(null, m.payload.nextLiftedState);
-							console.log(m.payload.nextLiftedState);
+
 							break;
 						}
 
