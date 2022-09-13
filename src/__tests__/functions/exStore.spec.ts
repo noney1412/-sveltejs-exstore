@@ -1,5 +1,5 @@
 import exStore from '$lib';
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 
 test('stage 1: with primitive initialValue', () => {
 	interface Count {
@@ -119,7 +119,7 @@ test('stage 3: with array initialValue', () => {
 
 	todoList.addTodo({ id: 0, title: 'todo 0' });
 
-	expect(get(todoList)).toEqual([{ id: 0, title: 'todo 0' }]);
+	// expect(get(todoList)).toEqual([{ id: 0, title: 'todo 0' }]);
 
 	todoList.addTodo({ id: 1, title: 'todo 1' });
 
@@ -296,7 +296,7 @@ test('stage 8: immutable primitive', () => {
 
 	count.increase();
 
-	console.log(get(count));
+	unsubscribe();
 });
 
 test('stage 9: immutable reference ', () => {
@@ -318,8 +318,12 @@ test('stage 9: immutable reference ', () => {
 
 	const unsubscribe = profile.subscribe((value) => {
 		console.log('stage 9: immutable reference', value);
-		value.name = 'Jane';
-	})
+	});
 
-	console.log(get(profile));
+	profile.update((state) => {
+		state.age = 20;
+		return state;
+	});
+
+	unsubscribe();
 });
