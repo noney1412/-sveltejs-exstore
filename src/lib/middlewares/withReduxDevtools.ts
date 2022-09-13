@@ -27,6 +27,7 @@ interface WithReduxDevtoolsOption {
 				// eslint-disable-next-line @typescript-eslint/ban-types
 				function?: boolean | Function;
 		  };
+	shouldHotReload?: boolean;
 }
 
 type JUMP_TO_STATE = {
@@ -106,7 +107,7 @@ const shared = {
 	devTool: initDevtool({
 		name: getTitle() ?? 'no title',
 		instanceId: getInstanceId(),
-		serialize: true
+		shouldHotReload: false
 	}),
 	stateToBeReset: '{}',
 	isSubscribed: false,
@@ -119,7 +120,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 	initStore();
 	subscribeStore();
 
-	function initStore() {
+	async function initStore() {
 		if (!isReadyForBrowser()) return;
 
 		if (shared.middlewareByName.has(middleware.storeName)) return;
@@ -203,7 +204,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						case 'IMPORT_STATE': {
 							const m: IMPORT_STATE = message as IMPORT_STATE;
 
-							const keys = Object.keys(m.payload.nextLiftedState.computedStates[0].state); // ['count', 'profile']
+							const keys = Object.keys(m.payload.nextLiftedState.computedStates[0].state);
 
 							const currentIndex = m.payload.nextLiftedState.currentStateIndex;
 
@@ -211,9 +212,11 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 							keys.forEach((key) => {
 								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
-								if (shared.middlewareByName.has(key)) {
-									const middleware = shared.middlewareByName.get(key);
-									middleware.store.set(value);
+								if (value) {
+									if (shared.middlewareByName.has(key)) {
+										const middleware = shared.middlewareByName.get(key);
+										middleware.store.set(value);
+									}
 								}
 							});
 
