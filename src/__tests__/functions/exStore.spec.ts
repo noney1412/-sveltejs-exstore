@@ -1,5 +1,5 @@
 import exStore from '$lib';
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 test('stage 1: with primitive initialValue', () => {
 	interface Count {
@@ -273,4 +273,53 @@ test('stage 7: subscription of the reference type', () => {
 	// postcondition
 	unsubscribe();
 	profile.changeName('Jane');
+});
+
+test('stage 8: immutable primitive', () => {
+	interface Count {
+		$initialValue: number;
+		increase: () => void;
+	}
+
+	const count = exStore<Count>({
+		name: 'count-test-store',
+		initialValue: 0,
+		actions: (state) => ({
+			increase: () => state.current + 1
+		})
+	});
+
+	const unsubscribe = count.subscribe((value) => {
+		console.log('stage 8: immutable', value);
+		value = 50;
+	});
+
+	count.increase();
+
+	console.log(get(count));
+});
+
+test('stage 9: immutable reference ', () => {
+	interface Profile {
+		name: string;
+		age: number;
+		changeName: (name: string) => void;
+	}
+
+	const profile = exStore<Profile>({
+		name: 'profile-test-store',
+		initialValue: {} as Profile,
+		actions: (state) => ({
+			changeName(name: string) {
+				state.name = name;
+			}
+		})
+	});
+
+	const unsubscribe = profile.subscribe((value) => {
+		console.log('stage 9: immutable reference', value);
+		value.name = 'Jane';
+	})
+
+	console.log(get(profile));
 });

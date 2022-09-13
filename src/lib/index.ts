@@ -97,7 +97,7 @@ function exStore<State>(slice: ExSlice<State>) {
 							} else {
 								state.current = fn(...args) as InitialValue<State>;
 								// the current is here (primitive type)
-								return state.current ?? current;
+								return state.current;
 							}
 						});
 					}
