@@ -208,7 +208,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 							const currentIndex = m.payload.nextLiftedState.currentStateIndex;
 
-							const slice = _.slice(m.payload.nextLiftedState.computedStates, 1, currentIndex + 1);
+							const slice = _.slice(m.payload.nextLiftedState.computedStates, 0, currentIndex + 1);
 
 							keys.forEach((key) => {
 								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
