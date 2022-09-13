@@ -49,6 +49,36 @@ type ROLLBACK = {
 	source: string;
 };
 
+type IMPORT_STATE = {
+	type: 'IMPORT_STATE';
+	payload: {
+		nextLiftedState: {
+			actionsById: {
+				[key: string]: {
+					action: { type: string };
+					timestamp: number;
+					type: 'PERFORM_ACTION';
+				};
+			};
+			computedStates: { state: any }[];
+			currentStateIndex: number;
+			nextActionId: number;
+			skippedActionIds: any[];
+			stagedActionIds: number[];
+		};
+	};
+};
+
+type PAUSE_RECORDING = {
+	type: string;
+	payload: {
+		type: string;
+		status: boolean;
+	};
+	id: string;
+	source: string;
+};
+
 function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', latency: 100 }) {
 	if (!isReadyForBrowser()) return;
 
@@ -79,6 +109,7 @@ const shared = {
 	}),
 	stateToBeReset: '{}',
 	isSubscribed: false,
+	isPaused: false,
 	middlewareByName: new Map()
 };
 
@@ -167,6 +198,30 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 							shared.devTool.init(state);
 							break;
 						}
+
+						case 'IMPORT_STATE': {
+							const m: IMPORT_STATE = message as IMPORT_STATE;
+							shared.devTool.send(null, m.payload.nextLiftedState);
+							console.log(m.payload.nextLiftedState);
+							break;
+						}
+
+						case 'PAUSE_RECORDING': {
+							const m: PAUSE_RECORDING = message as PAUSE_RECORDING;
+							shared.isPaused = m.payload.status;
+
+							const initialValue = {} as { [key: string]: unknown };
+
+							if (m.payload.status === false) {
+								shared.middlewareByName.forEach((middleware) => {
+									const m: Middleware<State> = middleware;
+									initialValue[m.storeName] = get(m.store);
+								});
+
+								shared.devTool.init(initialValue);
+							}
+							break;
+						}
 					}
 					break;
 				}
@@ -184,6 +239,8 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 			const devTools = shared.devTool;
 
 			if (!devTools) return;
+
+			if (shared.isPaused) return;
 
 			devTools.send(
 				{ type: `${middleware.storeName}/${middleware.currentActionName}` },
