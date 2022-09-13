@@ -66,6 +66,7 @@ const shared = {
 		instanceId: getInstanceId(),
 		serialize: true
 	}),
+	stateToBeReset: '{}',
 	isSubscribed: false,
 	middlewareByName: new Map()
 };
@@ -89,6 +90,8 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 			const m: Middleware<State> = middleware;
 			initialValue[m.storeName] = get(m.store);
 		});
+
+		shared.stateToBeReset = JSON.stringify(initialValue);
 
 		shared.devTool.init(initialValue);
 	}
@@ -116,6 +119,17 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 									}
 								});
 							}
+							break;
+						}
+						case 'RESET': {
+							const state = JSON.parse(shared.stateToBeReset as string);
+							shared.devTool.init(state);
+							Object.entries(state).forEach(([key, value]) => {
+								if (shared.middlewareByName.has(key)) {
+									const middleware = shared.middlewareByName.get(key);
+									middleware.store.set(value);
+								}
+							});
 							break;
 						}
 					}
