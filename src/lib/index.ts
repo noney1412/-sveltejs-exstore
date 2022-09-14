@@ -21,10 +21,21 @@ function exStore<State>(slice: ExSlice<State>) {
 		previousState: undefined as Nullable<InitialValue<State>>,
 		currentState: undefined as Nullable<InitialValue<State>>,
 		currentActionName: '',
-		store
+		store: {
+			subscribe: store.subscribe,
+			set: (x: InitialValue<State> | Record<string, never>) => {
+				if (x instanceof Object) {
+					store.set(x as InitialValue<State>);
+				} else {
+					state.current = x;
+					store.set(state.current);
+				}
+			},
+			update: store.update
+		}
 	});
 
-	const wrapStore = {
+	const wrapMiddlewareStore = {
 		set: (x: InitialValue<State> | Record<string, never>) => {
 			const m = get(middleware);
 			m.currentActionName = 'set';
@@ -46,7 +57,7 @@ function exStore<State>(slice: ExSlice<State>) {
 	wrapAction();
 	applyMiddleware();
 
-	return { subscribe: store.subscribe, update: wrapStore.update, set: wrapStore.set, ...actions };
+	return { subscribe: store.subscribe, update: wrapMiddlewareStore.update, set: wrapMiddlewareStore.set, ...actions };
 
 	/**
 	 * Define state if the initial value is primitive or reference type
