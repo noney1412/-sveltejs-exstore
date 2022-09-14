@@ -212,23 +212,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						case 'IMPORT_STATE': {
 							const m: IMPORT_STATE = message as IMPORT_STATE;
 
-							const keys = Object.keys(m.payload.nextLiftedState.computedStates[0].state);
-
-							const currentIndex = m.payload.nextLiftedState.currentStateIndex;
-
-							const slice = _.slice(m.payload.nextLiftedState.computedStates, 0, currentIndex + 1);
-
-							shared.liftedState = Object.assign({}, m.payload.nextLiftedState);
-
-							keys.forEach((key) => {
-								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
-								if (value) {
-									if (shared.middlewareByName.has(key)) {
-										const middleware = shared.middlewareByName.get(key);
-										middleware.store.set(value);
-									}
-								}
-							});
+							updateStoreFormLifedState(m.payload.nextLiftedState);
 
 							shared.devTool.send(null, m.payload.nextLiftedState);
 
@@ -277,8 +261,49 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						}
 
 						case 'SWEEP': {
-							const next = { ...shared.liftedState };
-							debugger;
+							const toSweep = { ...shared.liftedState };
+
+							// 1. sort action by id.
+							const actionsById = Object.fromEntries(
+								Object.entries(toSweep.actionsById)
+									.filter(([key]) => !toSweep.skippedActionIds.includes(Number(key)))
+									.map(([key, value], index) =>
+										index === 0 ? [key, value] : [String(index), value]
+									)
+							);
+
+							// 2. change stagedActionIds
+							const stagedActionIds = Array.from(Array(Object.keys(actionsById).length).keys());
+
+							// 3. filter computedStates
+							const computedStates = toSweep.computedStates.filter(
+								(_, index) => !toSweep.skippedActionIds.includes(index)
+							);
+
+							// 4. clear skippedActionIds
+							const skippedActionIds = [];
+
+							// 5. change nextActionId
+							const nextActionId = stagedActionIds.length;
+
+							// 6. change currentStateIndex
+							const currentStateIndex = stagedActionIds.length - 1;
+
+							const next: LIFTED_STATE = {
+								actionsById,
+								stagedActionIds,
+								skippedActionIds,
+								nextActionId,
+								currentStateIndex,
+								computedStates
+							};
+
+							shared.liftedState = { ...shared.liftedState, ...next };
+
+							// update the state
+							updateStoreFormLifedState(next);
+
+							shared.devTool.send(null, next);
 							break;
 						}
 					}
@@ -291,6 +316,24 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 		});
 
 		shared.isSubscribed = true;
+	}
+
+	function updateStoreFormLifedState(next: LIFTED_STATE) {
+		const keys = Object.keys(next.computedStates[0].state);
+
+		const currentIndex = next.currentStateIndex;
+
+		const slice = _.slice(next.computedStates, 0, currentIndex + 1);
+
+		keys.forEach((key) => {
+			const value = slice.filter((item) => item.state[key]).pop()?.state[key];
+			if (value) {
+				if (shared.middlewareByName.has(key)) {
+					const middleware = shared.middlewareByName.get(key);
+					middleware.store.set(value);
+				}
+			}
+		});
 	}
 
 	function update() {
