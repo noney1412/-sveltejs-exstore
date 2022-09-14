@@ -112,9 +112,9 @@ const shared = {
 		shouldHotReload: false
 	}),
 	stateToBeReset: '{}',
+	liftedState: {} as LIFTED_STATE,
 	isSubscribed: false,
 	isPaused: false,
-	skipActionIds: [] as number[],
 	middlewareByName: new Map()
 };
 
@@ -158,7 +158,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						case 'JUMP_TO_ACTION': {
 							const m: JUMP_TO_STATE = message as JUMP_TO_STATE;
 
-							if (shared.skipActionIds.includes(m.payload.actionId)) break;
+							if (shared.liftedState.skippedActionIds.includes(m.payload.actionId)) break;
 
 							const state = JSON.parse(m.state);
 							if (state instanceof Object) {
@@ -218,9 +218,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 							const slice = _.slice(m.payload.nextLiftedState.computedStates, 0, currentIndex + 1);
 
-							const skipActionIds = m.payload.nextLiftedState.skippedActionIds;
-
-							shared.skipActionIds = _.union(shared.skipActionIds, skipActionIds) as number[];
+							shared.liftedState = Object.assign({}, m.payload.nextLiftedState);
 
 							keys.forEach((key) => {
 								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
@@ -258,20 +256,29 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 							try {
 								const liftedState = JSON.parse(message.state);
 
-								shared.skipActionIds = _.union(shared.skipActionIds, [
+								shared.liftedState.skippedActionIds = _.union(shared.liftedState.skippedActionIds, [
 									message.payload.id
 								]) as number[];
 
 								const next: LIFTED_STATE = {
+									...shared.liftedState,
 									...liftedState,
-									skippedActionIds: shared.skipActionIds
+									skippedActionIds: shared.liftedState.skippedActionIds
 								};
+
+								shared.liftedState = next;
 
 								shared.devTool.send(null, next);
 							} catch (e) {
 								throw new Error('Could not parse the message state');
 							}
 
+							break;
+						}
+
+						case 'SWEEP': {
+							const next = { ...shared.liftedState };
+							debugger;
 							break;
 						}
 					}
