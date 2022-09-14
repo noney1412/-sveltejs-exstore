@@ -24,12 +24,7 @@ function exStore<State>(slice: ExSlice<State>) {
 		store: {
 			subscribe: store.subscribe,
 			set: (x: InitialValue<State> | Record<string, never>) => {
-				if (x instanceof Object) {
-					store.set(x as InitialValue<State>);
-				} else {
-					state.current = x;
-					store.set(state.current);
-				}
+				setState<State>(x, store, state);
 			},
 			update: store.update
 		}
@@ -40,12 +35,7 @@ function exStore<State>(slice: ExSlice<State>) {
 			const m = get(middleware);
 			m.currentActionName = 'set';
 			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			if (x instanceof Object) {
-				store.set(x as InitialValue<State>);
-			} else {
-				state.current = x;
-				store.set(state.current);
-			}
+			setState<State>(x, store, state);
 			m.currentState = get(store) as Nullable<InitialValue<State>>;
 			middleware.set(m);
 		},
@@ -140,6 +130,19 @@ function exStore<State>(slice: ExSlice<State>) {
 		middleware.subscribe((m) => {
 			withReduxDevtool<InitialValue<State>>(m);
 		});
+	}
+
+	function setState<State>(
+		x: InitialValue<State> | Record<string, never>,
+		store,
+		state: ExState<State>
+	) {
+		if (x instanceof Object) {
+			store.set(x as InitialValue<State>);
+		} else {
+			state.current = x;
+			store.set(state.current);
+		}
 	}
 }
 
