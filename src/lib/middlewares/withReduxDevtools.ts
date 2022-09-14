@@ -28,6 +28,8 @@ interface WithReduxDevtoolsOption {
 				function?: boolean | Function;
 		  };
 	shouldHotReload?: boolean;
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	trace?: boolean | Function;
 }
 
 type JUMP_TO_STATE = {
@@ -109,7 +111,11 @@ const shared = {
 	devTool: initDevtool({
 		name: getTitle() ?? 'no title',
 		instanceId: getInstanceId(),
-		shouldHotReload: false
+		shouldHotReload: false,
+		trace: (action: any) => {
+			console.log(new Error().stack);
+			return new Error().stack;
+		}
 	}),
 	stateToBeReset: '{}',
 	liftedState: {} as LIFTED_STATE,
