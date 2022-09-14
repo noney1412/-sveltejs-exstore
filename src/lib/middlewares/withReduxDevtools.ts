@@ -114,7 +114,7 @@ const shared = {
 	stateToBeReset: '{}',
 	isSubscribed: false,
 	isPaused: false,
-	skipActionIds: [],
+	skipActionIds: [] as number[],
 	middlewareByName: new Map()
 };
 
@@ -213,6 +213,11 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 							const slice = _.slice(m.payload.nextLiftedState.computedStates, 0, currentIndex + 1);
 
+							const skipActionIds = m.payload.nextLiftedState.skippedActionIds;
+
+							shared.skipActionIds = _.union(shared.skipActionIds, skipActionIds) as number[];
+
+							debugger;
 							keys.forEach((key) => {
 								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
 								if (value) {
@@ -249,7 +254,9 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 							try {
 								const liftedState = JSON.parse(message.state);
 
-								shared.skipActionIds = _.union(shared.skipActionIds, [message.payload.id]) as any;
+								shared.skipActionIds = _.union(shared.skipActionIds, [
+									message.payload.id
+								]) as number[];
 
 								const next: LIFTED_STATE = {
 									...liftedState,
