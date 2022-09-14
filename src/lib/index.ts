@@ -40,7 +40,12 @@ function exStore<State>(slice: ExSlice<State>) {
 			const m = get(middleware);
 			m.currentActionName = 'set';
 			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			store.set(x as InitialValue<State>);
+			if (x instanceof Object) {
+				store.set(x as InitialValue<State>);
+			} else {
+				state.current = x;
+				store.set(state.current);
+			}
 			m.currentState = get(store) as Nullable<InitialValue<State>>;
 			middleware.set(m);
 		},
@@ -57,7 +62,12 @@ function exStore<State>(slice: ExSlice<State>) {
 	wrapAction();
 	applyMiddleware();
 
-	return { subscribe: store.subscribe, update: wrapMiddlewareStore.update, set: wrapMiddlewareStore.set, ...actions };
+	return {
+		subscribe: store.subscribe,
+		update: wrapMiddlewareStore.update,
+		set: wrapMiddlewareStore.set,
+		...actions
+	};
 
 	/**
 	 * Define state if the initial value is primitive or reference type
