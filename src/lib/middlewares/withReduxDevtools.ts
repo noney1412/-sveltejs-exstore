@@ -114,6 +114,7 @@ const shared = {
 	stateToBeReset: '{}',
 	isSubscribed: false,
 	isPaused: false,
+	skipActionIds: [],
 	middlewareByName: new Map()
 };
 
@@ -245,14 +246,14 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						}
 
 						case 'TOGGLE_ACTION': {
-							console.log('hello');
-
 							try {
 								const liftedState = JSON.parse(message.state);
 
+								shared.skipActionIds = _.union(shared.skipActionIds, [message.payload.id]) as any;
+
 								const next: LIFTED_STATE = {
 									...liftedState,
-									skippedActionIds: [message.payload.id]
+									skippedActionIds: shared.skipActionIds
 								};
 
 								shared.devTool.send(null, next);
