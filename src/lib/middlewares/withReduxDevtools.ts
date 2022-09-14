@@ -157,6 +157,9 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 						case 'JUMP_TO_STATE':
 						case 'JUMP_TO_ACTION': {
 							const m: JUMP_TO_STATE = message as JUMP_TO_STATE;
+
+							if (shared.skipActionIds.includes(m.payload.actionId)) break;
+
 							const state = JSON.parse(m.state);
 							if (state instanceof Object) {
 								Object.entries(state).forEach(([key, value]) => {
@@ -217,7 +220,6 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 							shared.skipActionIds = _.union(shared.skipActionIds, skipActionIds) as number[];
 
-							debugger;
 							keys.forEach((key) => {
 								const value = slice.filter((item) => item.state[key]).pop()?.state[key];
 								if (value) {
