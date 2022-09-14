@@ -165,6 +165,8 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 								Object.entries(state).forEach(([key, value]) => {
 									if (shared.middlewareByName.has(key)) {
 										const middleware = shared.middlewareByName.get(key);
+
+										//FIXME: if the state is primitive type, it will not synchronize.
 										middleware.store.set(value);
 									}
 								});
