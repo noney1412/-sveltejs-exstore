@@ -5,6 +5,7 @@ A writable store wrapper that connects to the redux devtools.
 ## Creating a store
 
 ### With Reference Type
+
 ```typescript
 interface Count {
 	value: number;
@@ -17,13 +18,13 @@ const profile = exStore<Profile>({
 	actions: (state) => ({
 		increase: () => {
 			state.value += 1;
-		},
+		}
 	})
 });
-
 ```
 
 ### With Primitive Type
+
 ```typescript
 interface Count {
 	$initialValue: number;
@@ -43,5 +44,4 @@ const count = exStore<Count>({
 		reset: () => 0
 	})
 });
-
 ```
