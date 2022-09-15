@@ -132,7 +132,8 @@ function exStore<State>(slice: ExSlice<State>) {
 
 	function getTrace() {
 		const stack = new Error().stack?.split('\n');
-		const trace = [stack?.at(0), stack?.at(-1)].join('\n');
+		const svelte = stack?.filter((x) => x.includes('.svelte')) ?? [];
+		const trace = [stack?.at(0), ...svelte].join('\n');
 		return trace;
 	}
 
