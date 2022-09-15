@@ -7,4 +7,5 @@ export type Middleware<State> = {
 	currentState: Nullable<State>;
 	currentActionName: string;
 	store: Writable<State>;
+	trace?: string;
 };

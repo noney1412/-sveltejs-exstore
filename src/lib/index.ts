@@ -27,7 +27,8 @@ function exStore<State>(slice: ExSlice<State>) {
 				setState<State>(x, store, state);
 			},
 			update: store.update
-		}
+		},
+		trace: ''
 	});
 
 	const wrapMiddlewareStore = {
@@ -36,6 +37,7 @@ function exStore<State>(slice: ExSlice<State>) {
 			m.currentActionName = 'set';
 			m.previousState = get(store) as Nullable<InitialValue<State>>;
 			setState<State>(x, store, state);
+			m.trace = getTrace();
 			m.currentState = get(store) as Nullable<InitialValue<State>>;
 			middleware.set(m);
 		},
@@ -44,6 +46,7 @@ function exStore<State>(slice: ExSlice<State>) {
 			m.currentActionName = 'update';
 			m.previousState = get(store) as Nullable<InitialValue<State>>;
 			store.update(fn);
+			m.trace = getTrace();
 			m.currentState = get(store) as Nullable<InitialValue<State>>;
 			middleware.set(m);
 		}
@@ -103,10 +106,14 @@ function exStore<State>(slice: ExSlice<State>) {
 						store.update((current) => {
 							if (current instanceof Object) {
 								fn(...args);
+								m.trace = getTrace();
+
 								// the current is here (reference type)
 								return state as InitialValue<State>;
 							} else {
 								state.current = fn(...args) as InitialValue<State>;
+								m.trace = getTrace();
+
 								// the current is here (primitive type)
 								return state.current;
 							}
@@ -121,6 +128,12 @@ function exStore<State>(slice: ExSlice<State>) {
 				};
 			}
 		}
+	}
+
+	function getTrace() {
+		const stack = new Error().stack?.split('\n');
+		const trace = [stack?.at(0), stack?.at(-1)].join('\n');
+		return trace;
 	}
 
 	/**

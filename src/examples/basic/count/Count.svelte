@@ -23,7 +23,9 @@
 			h="full"
 			text="light-50"
 		/>
-		<button on:click={count.increase} w="60px" h="full" bg="dark-50 hover:dark-500">+</button>
+		<button on:click={() => count.increase()} w="60px" h="full" bg="dark-50 hover:dark-500"
+			>+</button
+		>
 	</div>
 	<button on:click={() => count.increaseBy(5)} h="60px" bg="hover:dark-500" font="hover:bold" p="4"
 		>increase by 5</button
