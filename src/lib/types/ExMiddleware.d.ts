@@ -8,4 +8,5 @@ export type Middleware<State> = {
 	currentActionName: string;
 	store: Writable<State>;
 	trace?: string;
+	defaultTrace?: string;
 };

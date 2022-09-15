@@ -6,6 +6,7 @@ import type { Nullable, OnlyFunc } from './types/utils';
 
 function exStore<State>(slice: ExSlice<State>) {
 	const store = writable<InitialValue<State>>(slice.initialValue as InitialValue<State>);
+	console.log(new Error().stack);
 
 	let state: ExState<State> = {} as ExState<State>;
 	type WrappedAction = OnlyFunc<State> & {
@@ -28,7 +29,8 @@ function exStore<State>(slice: ExSlice<State>) {
 			},
 			update: store.update
 		},
-		trace: ''
+		trace: '',
+		defaultTrace: new Error().stack
 	});
 
 	const wrapMiddlewareStore = {
@@ -133,7 +135,8 @@ function exStore<State>(slice: ExSlice<State>) {
 	function getTrace() {
 		const stack = new Error().stack?.split('\n');
 		const svelte = stack?.filter((x) => x.includes('.svelte')) ?? [];
-		const trace = [stack?.at(0), ...svelte].join('\n');
+		const store = [get(middleware).defaultTrace?.split('\n').at(-1)] ?? [];
+		const trace = [stack?.at(0), ...svelte, ...store].join('\n');
 		return trace;
 	}
 
