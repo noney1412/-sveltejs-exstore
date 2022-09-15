@@ -118,7 +118,14 @@ const shared = {
 		}
 	}),
 	stateToBeReset: '{}',
-	liftedState: {} as LIFTED_STATE,
+	liftedState: {
+		actionsById: {},
+		computedStates: [],
+		currentStateIndex: 0,
+		nextActionId: 0,
+		skippedActionIds: [],
+		stagedActionIds: []
+	} as LIFTED_STATE,
 	isSubscribed: false,
 	isPaused: false,
 	middlewareByName: new Map()
