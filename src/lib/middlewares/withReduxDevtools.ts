@@ -1,5 +1,5 @@
 import type { Middleware } from '$lib/types/ExMiddleware';
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
 import _ from 'lodash';
 
@@ -107,10 +107,16 @@ function getInstanceId() {
 	return window.btoa(location.href);
 }
 
+const traceStore = writable<string>(undefined);
+
 const devtoolOptions = {
 	name: getTitle() ?? 'no title',
 	instanceId: getInstanceId(),
-	shouldHotReload: false
+	shouldHotReload: false,
+	trace: () => {
+		const trace = get(traceStore);
+		return trace || new Error('trace is not defined').stack;
+	}
 };
 
 const shared = {
@@ -349,16 +355,12 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 	function update() {
 		if (shared.middlewareByName.has(middleware.storeName)) {
-			const devTools = initDevtool({
-				...devtoolOptions,
-				trace: () => {
-					return middleware.trace || new Error('trace is not defined').stack;
-				}
-			});
+			traceStore.set(middleware.trace || '');
 
 			if (shared.isPaused) return;
+			if (!shared.devTool) return;
 
-			devTools.send(
+			shared.devTool.send(
 				{ type: `${middleware.storeName}/${middleware.currentActionName}` },
 				{
 					[middleware.storeName]: get(middleware.store)
