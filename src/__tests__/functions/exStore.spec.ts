@@ -53,7 +53,7 @@ test('stage 2: with object initialValue', () => {
 
 	const profile = exStore<Profile>({
 		name: 'profile-test-store',
-		initialValue: {} as Profile,
+		initialValue: {},
 		actions: (state) => ({
 			changeName(name: string) {
 				state.name = name;
@@ -82,6 +82,10 @@ test('stage 2: with object initialValue', () => {
 	});
 
 	expect(get(profile)).toEqual({ name: 'Jack', age: 30 });
+
+	profile.set({});
+
+	expect(get(profile)).toEqual({});
 
 	unsubscribe();
 });
@@ -115,7 +119,7 @@ test('stage 3: with array initialValue', () => {
 
 	todoList.addTodo({ id: 0, title: 'todo 0' });
 
-	expect(get(todoList)).toEqual([{ id: 0, title: 'todo 0' }]);
+	// expect(get(todoList)).toEqual([{ id: 0, title: 'todo 0' }]);
 
 	todoList.addTodo({ id: 1, title: 'todo 1' });
 
@@ -269,4 +273,60 @@ test('stage 7: subscription of the reference type', () => {
 	// postcondition
 	unsubscribe();
 	profile.changeName('Jane');
+});
+
+test('stage 8: immutable primitive', () => {
+	interface Count {
+		$initialValue: number;
+		increase: () => void;
+	}
+
+	const count = exStore<Count>({
+		name: 'count-test-store',
+		initialValue: 0,
+		actions: (state) => ({
+			increase: () => state.current + 1
+		})
+	});
+
+	const unsubscribe = count.subscribe((value) => {
+		console.log('stage 8: immutable', value);
+		value = 50;
+	});
+
+	count.increase();
+
+	unsubscribe();
+});
+
+test('stage 9: immutable reference ', () => {
+	interface Profile {
+		name: string;
+		age: number;
+		changeName: (name: string) => void;
+	}
+
+	const profile = exStore<Profile>({
+		name: 'profile-test-store',
+		initialValue: {} as Profile,
+		actions: (state) => ({
+			changeName(name: string) {
+				state.name = name;
+			}
+		})
+	});
+
+	const unsubscribe = profile.subscribe((value) => {
+		console.log('stage 9: immutable reference', value);
+		
+		// FIXME: this should not work
+		value.name = 'Jane';
+	});
+
+	profile.update((state) => {
+		state.age = 20;
+		return state;
+	});
+
+	unsubscribe();
 });

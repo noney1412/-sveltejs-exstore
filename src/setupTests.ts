@@ -45,12 +45,12 @@ vi.mock('$app/stores', async () => {
 	};
 });
 
-vi.mock('$app/env', async () => {
-	/** @type {typeof import('$app/env').browser} */
+vi.mock('$app/environment', async () => {
+	/** @type {typeof import('$app/environment').browser} */
 	const browser = true;
-	/** @type {typeof import('$app/env').dev} */
+	/** @type {typeof import('$app/environment').dev} */
 	const dev = true;
-	/** @type {typeof import('$app/env').prerendering} */
+	/** @type {typeof import('$app/environment').prerendering} */
 	const prerendering = false;
 
 	return {

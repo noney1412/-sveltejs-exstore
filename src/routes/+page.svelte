@@ -2,8 +2,18 @@
 </script>
 
 <div class="page" w="screen" h="screen">
-	<div class="page-content" w="full" h="full" flex="~" justify="center" align="items-center">
+	<div
+		class="page-content"
+		w="full"
+		h="full"
+		flex="~ col"
+		justify="center"
+		align="items-center"
+		gap="3"
+	>
 		<a href="/examples/count">count example</a>
+		<a href="/examples/profile">profile example</a>
+		<a href="/examples/devtools">devtools example</a>
 	</div>
 </div>
 
