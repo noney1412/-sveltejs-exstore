@@ -1,40 +1,47 @@
 [![Node.js CI](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml/badge.svg)](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml)
 
-# create-svelte
+A writable store wrapper that connects to the redux devtools.
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## Creating a store
 
-## Creating a project
+### With Reference Type
+```typescript
+interface Count {
+	value: number;
+	increase: () => void;
+}
 
-If you're seeing this, you've probably already done this step. Congrats!
+const profile = exStore<Profile>({
+	name: 'profile',
+	initialValue: { value: 0 },
+	actions: (state) => ({
+		increase: () => {
+			state.value += 1;
+		},
+	})
+});
 
-```bash
-# create a new project in the current directory
-npm init svelte
-
-# create a new project in my-app
-npm init svelte my-app
 ```
 
-## Developing
+### With Primitive Type
+```typescript
+interface Count {
+	$initialValue: number;
+	increase: () => void;
+	decrease: () => void;
+	increaseBy: (by: number) => void;
+	reset: () => void;
+}
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+const count = exStore<Count>({
+	name: 'count',
+	initialValue: 0,
+	actions: (state) => ({
+		increase: () => state.current + 1,
+		increaseBy: (by) => state.current + by,
+		decrease: () => state.current - 1,
+		reset: () => 0
+	})
+});
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
