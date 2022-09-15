@@ -28,7 +28,7 @@ export type ExSlice<State> = {
 	 * The initial value of State.
 	 * - the type specify by only the primitive types of the State.
 	 */
-	initialValue: InitialValue<State>;
+	initialValue: InitialValue<State> | Record<string, InitialValue<State>>;
 	/**
 	 * The actions is the function that contains all the actions in the store.
 	 * - the type specify by from only the function types of the State.

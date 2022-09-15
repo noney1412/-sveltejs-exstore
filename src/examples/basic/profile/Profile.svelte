@@ -39,4 +39,14 @@
 			bind:value={$profile.age}
 		/>
 	</div>
+	<button
+		on:click={() => {
+			profile.changeName('John Doe');
+		}}>Change Name To John Doe</button
+	>
+	<button
+		on:click={() => {
+			profile.set({});
+		}}>Reset Name</button
+	>
 </div>
