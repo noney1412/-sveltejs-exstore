@@ -107,16 +107,14 @@ function getInstanceId() {
 	return window.btoa(location.href);
 }
 
+const devtoolOptions = {
+	name: getTitle() ?? 'no title',
+	instanceId: getInstanceId(),
+	shouldHotReload: false
+};
+
 const shared = {
-	devTool: initDevtool({
-		name: getTitle() ?? 'no title',
-		instanceId: getInstanceId(),
-		shouldHotReload: false,
-		trace: (action: any) => {
-			console.log(new Error().stack);
-			return new Error().stack;
-		}
-	}),
+	devTool: initDevtool(devtoolOptions),
 	stateToBeReset: '{}',
 	liftedState: {} as LIFTED_STATE,
 	isSubscribed: false,
@@ -344,9 +342,12 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 	function update() {
 		if (shared.middlewareByName.has(middleware.storeName)) {
-			const devTools = shared.devTool;
-
-			if (!devTools) return;
+			const devTools = initDevtool({
+				...devtoolOptions,
+				trace: () => {
+					return middleware.trace || new Error('trace is not defined').stack;
+				}
+			});
 
 			if (shared.isPaused) return;
 
