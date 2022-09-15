@@ -6,7 +6,6 @@ import type { Nullable, OnlyFunc } from './types/utils';
 
 function exStore<State>(slice: ExSlice<State>) {
 	const store = writable<InitialValue<State>>(slice.initialValue as InitialValue<State>);
-	console.log(new Error().stack);
 
 	let state: ExState<State> = {} as ExState<State>;
 	type WrappedAction = OnlyFunc<State> & {
