@@ -1,4 +1,4 @@
-import { initState } from './createExStore';
+import { initState } from './initState';
 
 describe('init state with initState<State>', () => {
 	it('flatten: $init', () => {
