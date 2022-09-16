@@ -1,3 +1,4 @@
+import type { Options } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
 
 interface Profile {
@@ -46,6 +47,20 @@ test('Extract Only State Props', () => {
 
 	expect($state.name).toBe('new name');
 	expect($state.age).toBe(30);
+});
+
+test('Key in Options', () => {
+	function isKeyOfObject<T>(key: string | number | symbol, obj: T): key is keyof T {
+		return key in obj;
+	}
+
+	const options: Options = {
+		$name: '',
+		$options: {}
+	};
+
+	expect(isKeyOfObject('$name', options)).toBe(true);
+	expect(isKeyOfObject('$options', options)).toBe(true);
 });
 
 test('Bind this from $state to $actions', () => {
