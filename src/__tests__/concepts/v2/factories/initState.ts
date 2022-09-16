@@ -1,7 +1,8 @@
 import type { Options } from '../types/ExSlice';
+import type { OnlyFunc, OnlyState } from '../types/Utils';
 
 // draft: 1 exslice should support $init: {}
-type ExSlice<State> = State & Partial<Options>;
+type ExSlice<State> = OnlyFunc<State> & Partial<OnlyState<State>> & Partial<Options>;
 export function initState<State>(slice: ExSlice<State>) {
 	const options: Array<keyof Options> = ['$name', '$options'];
 

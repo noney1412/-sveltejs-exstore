@@ -162,4 +162,43 @@ describe('init state with initState<State>', () => {
 			}
 		});
 	});
+
+	it('flatten value: $init, name with $name and $options', () => {
+		interface Profile {
+			name: string;
+			age: number;
+			rename(name: string): void;
+			anyVoid(): void;
+		}
+
+		const withAction = initState<Profile>({
+			anyVoid() {
+				// ...
+			},
+			rename(name: string) {
+				// ...
+				name;
+			}
+		});
+
+		expect(withAction).toEqual({
+			$init: {}
+		});
+
+		const withoutAction = initState<Profile>({
+			name: '',
+			rename(name: string) {
+				this.name = name;
+			},
+			anyVoid() {
+				// ...
+			}
+		});
+
+		expect(withoutAction).toEqual({
+			$init: {
+				name: ''
+			}
+		});
+	});
 });
