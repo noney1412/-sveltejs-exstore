@@ -5,7 +5,7 @@ interface SharedState<T> {
 	name: string;
 	bind: Partial<OnlyState<T>>;
 	mode: 'primitive' | 'reference';
-	initialState: any;
+	initialState: Partial<OnlyState<T>> extends { $init: infer U } ? U : Partial<OnlyState<T>>;
 }
 
 export function initSharedState<State>(slice: ExSlice<State>) {
