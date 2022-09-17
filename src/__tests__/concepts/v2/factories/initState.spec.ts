@@ -201,4 +201,15 @@ describe('init state with initState<State>', () => {
 			}
 		});
 	});
+
+	it('flatten value: without actions', () => {
+		interface Profile {
+			name: string;
+			age: number;
+		}
+
+		const profile = initState<Profile>({});
+
+		expect(profile).toEqual({ $init: {} });
+	});
 });
