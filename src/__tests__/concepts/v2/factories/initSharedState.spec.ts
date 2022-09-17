@@ -1,4 +1,4 @@
-import { analyzeMode, bindState, getInitialState } from './initState';
+import { analyzeMode, bindState, getInitialState } from './initSharedState';
 
 describe(`The state to be bound to an action is called "bind."`, () => {
 	it('case 1: only $init', () => {

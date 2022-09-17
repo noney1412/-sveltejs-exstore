@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { initSharedState } from './factories/initState';
+import { initSharedState } from './factories/initSharedState';
 import type { ExSlice } from './types/ExSlice';
 
 export function ex<State>(slice: ExSlice<State>) {
