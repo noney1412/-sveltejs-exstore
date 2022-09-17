@@ -1,4 +1,4 @@
-import { initState } from './createExStore';
+import { initState } from './initState';
 
 describe('init state with initState<State>', () => {
 	it('flatten: $init', () => {
@@ -161,5 +161,55 @@ describe('init state with initState<State>', () => {
 				age: 30
 			}
 		});
+	});
+
+	it('flatten value: $init, name with $name and $options', () => {
+		interface Profile {
+			name: string;
+			age: number;
+			rename(name: string): void;
+			anyVoid(): void;
+		}
+
+		const withAction = initState<Profile>({
+			anyVoid() {
+				// ...
+			},
+			rename(name: string) {
+				// ...
+				name;
+			}
+		});
+
+		expect(withAction).toEqual({
+			$init: {}
+		});
+
+		const withoutAction = initState<Profile>({
+			name: '',
+			rename(name: string) {
+				this.name = name;
+			},
+			anyVoid() {
+				// ...
+			}
+		});
+
+		expect(withoutAction).toEqual({
+			$init: {
+				name: ''
+			}
+		});
+	});
+
+	it('flatten value: without actions', () => {
+		interface Profile {
+			name: string;
+			age: number;
+		}
+
+		const profile = initState<Profile>({});
+
+		expect(profile).toEqual({ $init: {} });
 	});
 });

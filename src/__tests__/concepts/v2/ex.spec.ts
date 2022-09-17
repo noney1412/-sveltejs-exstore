@@ -19,6 +19,7 @@ function ex<State>(slice: ExSlice<State>) {
 
 	return store;
 
+	// FIXME: 1. exslice should support $init: {}
 	function initState(slice: ExSlice<State>) {
 		const options: Array<keyof Options> = ['$name', '$options'];
 
