@@ -7,7 +7,7 @@ describe('init state with initState<State>(slice: ExSlice<State>)', () => {
 });
 
 describe('get state with getState<State>(slice: ExSlice<State>)', () => {
-	it('stage:1 flatten $init', () => {
+	it('case 1: only $init', () => {
 		interface Count {
 			$init: number;
 			increase: () => void;
@@ -36,7 +36,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		expect(state).toEqual({ $init: 0 });
 	});
 
-	it('stage:2 flatten $init with $name', () => {
+	it('case 2: $init with $name', () => {
 		interface Count {
 			$init: number;
 			$name: string;
@@ -67,7 +67,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		expect(state).toEqual({ $init: 0 });
 	});
 
-	it('state:3 flatten $init with $options', () => {
+	it('case 3: $init with $options', () => {
 		interface Count {
 			$init: number;
 			$options: {
@@ -103,7 +103,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		expect(state).toEqual({ $init: 0 });
 	});
 
-	it('flatten value: number with $name and $options', () => {
+	it('case 4: number with $name and $options', () => {
 		interface Count {
 			value: number;
 			$name: string;
@@ -143,7 +143,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		});
 	});
 
-	it('flatten value: name, age with $name and $options', () => {
+	it('case 5: name, age with $name and $options', () => {
 		interface Profile {
 			name: string;
 			age: number;
@@ -167,7 +167,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		});
 	});
 
-	it('flatten value: $init, name with $name and $options', () => {
+	it('case 6: $init, name with $name and $options', () => {
 		interface Profile {
 			name: string;
 			age: number;
@@ -202,7 +202,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		});
 	});
 
-	it('flatten value: without actions', () => {
+	it('case 7: without actions', () => {
 		interface Profile {
 			name: string;
 			age: number;
@@ -211,5 +211,16 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 		const profile = getState<Profile>({});
 
 		expect(profile).toEqual({});
+	});
+
+	it('case 8: only reference', () => {
+		interface Profile {
+			name: string;
+			age: number;
+		}
+
+		const profile = getState<Profile>({ name: 'John', age: 30 });
+
+		expect(profile).toEqual({ name: 'John', age: 30 });
 	});
 });
