@@ -1,40 +1,7 @@
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import type { ExSlice, Options } from './types/ExSlice';
 import { expectType } from 'vite-plugin-vitest-typescript-assert/tsd';
-import type { OnlyState } from './types/Utils';
-
-function ex<State>(slice: ExSlice<State>) {
-	// extract state from slice.
-	const $state = initState(slice);
-
-	console.log($state);
-
-	const $options: Options = {
-		$name: '',
-		$options: {}
-	};
-
-	const store = writable(($state as any).$init);
-
-	return store;
-
-	// FIXME: 1. exslice should support $init: {}
-	function initState(slice: ExSlice<State>) {
-		const options: Array<keyof Options> = ['$name', '$options'];
-
-		const isNotFunctionAndNotOptions = (key: string, value: unknown) =>
-			typeof value !== 'function' && !options.includes(key as keyof Options);
-
-		const filtered = Object.entries(slice).filter(([key, value]) =>
-			isNotFunctionAndNotOptions(key, value)
-		);
-
-		const $state = Object.fromEntries(filtered) as OnlyState<State>;
-
-		return $state;
-	}
-}
+import { ex } from './ex';
 
 interface Count {
 	$init: number;
