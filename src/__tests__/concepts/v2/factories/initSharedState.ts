@@ -1,11 +1,18 @@
+import { isReadyForBrowser } from '$lib/middlewares/utils';
 import type { ExSlice, Extensions } from '../types/ExSlice';
 import type { OnlyState } from '../types/Utils';
-
+import uuid from 'uuid-random'
 interface SharedState<T> {
 	name: string;
 	bind: Partial<OnlyState<T>>;
 	mode: 'primitive' | 'reference';
 	initialState: any;
+}
+
+export function getInstanceId() {
+	if (!isReadyForBrowser()) return;
+
+	return window.btoa(location.href);
 }
 
 export function initSharedState<State>(slice: ExSlice<State>) {
@@ -16,6 +23,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 		initialState: slice.$init
 	};
 
+	state.name = slice.$name || 'anonymous_' + uuid();
 	state.bind = bindState(slice);
 	state.mode = analyzeMode(slice);
 	state.initialState = getInitialState<State>(state);
