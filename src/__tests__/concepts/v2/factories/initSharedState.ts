@@ -1,4 +1,3 @@
-import { isReadyForBrowser } from '$lib/middlewares/utils';
 import type { ExSlice, Extensions } from '../types/ExSlice';
 import type { OnlyState } from '../types/Utils';
 import uuid from 'uuid-random';
