@@ -1,6 +1,6 @@
-import { analyzeMode, bindState } from './initState';
+import { analyzeMode, bindState, getInitialState } from './initState';
 
-describe(`bind state with bindState<State>(slice: ExSlice<State>): SharedState<State>['bind']`, () => {
+describe(`The state to be bound to an action is called "bind."`, () => {
 	it('case 1: only $init', () => {
 		interface Count {
 			$init: number;
@@ -219,7 +219,7 @@ describe(`bind state with bindState<State>(slice: ExSlice<State>): SharedState<S
 	});
 });
 
-describe('mode', () => {
+describe('mode helps to specific data type of the state whether it is primitive or reference.', () => {
 	it('should return primitive when $init is primitive', () => {
 		const slice = {
 			$init: 0
@@ -249,5 +249,44 @@ describe('mode', () => {
 		const mode = analyzeMode(slice);
 
 		expect(mode).toBe('reference');
+	});
+});
+
+describe('The state that will be passed to the storage is initialState.', () => {
+	it('return flatten $init when the state is primitive.', () => {
+		const state = {
+			bind: {
+				$init: 0
+			},
+			mode: 'primitive'
+		};
+		const init = getInitialState<any>(state as any);
+
+		expect(init).toEqual(0);
+	});
+
+	it('return exact state if it is reference type.', () => {
+		const state = {
+			bind: {
+				$init: 0
+			},
+			mode: 'reference'
+		};
+		const init = getInitialState<any>(state as any);
+
+		expect(init).toEqual({ $init: 0 });
+	});
+
+	it('return exact state if it is reference type.', () => {
+		const state = {
+			bind: {
+				name: 'John',
+				age: 30
+			},
+			mode: 'reference'
+		};
+		const init = getInitialState<any>(state as any);
+
+		expect(init).toEqual({ name: 'John', age: 30 });
 	});
 });

@@ -5,20 +5,20 @@ interface SharedState<T> {
 	name: string;
 	bind: Partial<OnlyState<T>>;
 	mode: 'primitive' | 'reference';
-	get: any;
+	initialState: any;
 }
 
-export function initState<State>(slice: ExSlice<State>) {
+export function initSharedState<State>(slice: ExSlice<State>) {
 	const state: SharedState<State> = {
 		name: 'anonymous',
 		bind: {},
 		mode: 'primitive', // default is primitive
-		get: slice.$init
+		initialState: slice.$init
 	};
 
 	state.bind = bindState(slice);
 	state.mode = analyzeMode(slice);
-	state.get = getState<State>(state);
+	state.initialState = getInitialState<State>(state);
 
 	return state;
 }
@@ -43,13 +43,13 @@ export function analyzeMode<State>(slice: ExSlice<State>): SharedState<State>['m
 	return slice.$init instanceof Object ? 'reference' : 'primitive';
 }
 
-export function getState<State>(state: SharedState<State>) {
+export function getInitialState<State>(state: SharedState<State>) {
 	const bind = state.bind as any;
 	let init: any;
 
 	if (bind.$init !== undefined) {
 		init = bind.$init;
 	}
-	
+
 	return state.mode === 'primitive' ? init : state.bind;
 }
