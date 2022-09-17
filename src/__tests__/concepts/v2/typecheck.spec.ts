@@ -90,3 +90,28 @@ test('Bind this from $state to $actions', () => {
 	expect($state.name).toBe('new name');
 	expect($state.age).toBe(30);
 });
+
+test('infer undefined', () => {
+	type CanBeUndefined<T> = T extends undefined ? true : false;
+
+	const t1: CanBeUndefined<undefined> = true;
+
+	expect(t1).toBe(true);
+
+	const t2: CanBeUndefined<string> = false;
+
+	expect(t2).toBe(false);
+});
+
+test('infer $init', () => {
+	type WithInit<T> = T extends { $init: infer U } ? U : never;
+
+	type Profile = {
+		name: string;
+		$init: string;
+	};
+
+	const t1: WithInit<Profile> = 'John Doe';
+
+	expect(t1).toBe('John Doe');
+});
