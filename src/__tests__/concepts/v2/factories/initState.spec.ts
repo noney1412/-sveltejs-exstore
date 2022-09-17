@@ -1,7 +1,13 @@
-import { initState } from './initState';
+import { getState } from './initState';
 
-describe('init state with initState<State>', () => {
-	it('flatten: $init', () => {
+describe('init state with initState<State>(slice: ExSlice<State>)', () => {
+	it('should ', () => {
+		//
+	});
+});
+
+describe('get state with getState<State>(slice: ExSlice<State>)', () => {
+	it('stage:1 flatten $init', () => {
 		interface Count {
 			$init: number;
 			increase: () => void;
@@ -10,7 +16,7 @@ describe('init state with initState<State>', () => {
 			reset: () => void;
 		}
 
-		const state = initState<Count>({
+		const state = getState<Count>({
 			$init: 0,
 			increase: () => {
 				// ...
@@ -30,7 +36,7 @@ describe('init state with initState<State>', () => {
 		expect(state).toEqual({ $init: 0 });
 	});
 
-	it('flatten: $init with $name', () => {
+	it('stage:2 flatten $init with $name', () => {
 		interface Count {
 			$init: number;
 			$name: string;
@@ -40,7 +46,7 @@ describe('init state with initState<State>', () => {
 			reset: () => void;
 		}
 
-		const state = initState<Count>({
+		const state = getState<Count>({
 			$init: 0,
 			$name: 'count', // this is not part of the state
 			increase: () => {
@@ -61,7 +67,7 @@ describe('init state with initState<State>', () => {
 		expect(state).toEqual({ $init: 0 });
 	});
 
-	it('flatten: $init with $options', () => {
+	it('state:3 flatten $init with $options', () => {
 		interface Count {
 			$init: number;
 			$options: {
@@ -73,7 +79,7 @@ describe('init state with initState<State>', () => {
 			reset: () => void;
 		}
 
-		const state = initState<Count>({
+		const state = getState<Count>({
 			$init: 0,
 			$options: {
 				// this is not part of the state
@@ -110,7 +116,7 @@ describe('init state with initState<State>', () => {
 			reset: () => void;
 		}
 
-		const state = initState<Count>({
+		const state = getState<Count>({
 			value: 0,
 			$name: 'count', // this is not part of the state
 			$options: {
@@ -133,7 +139,7 @@ describe('init state with initState<State>', () => {
 		});
 
 		expect(state).toEqual({
-			$init: { value: 0 }
+			value: 0
 		});
 	});
 
@@ -144,7 +150,7 @@ describe('init state with initState<State>', () => {
 			changeName: (name: string) => void;
 		}
 
-		const state = initState<Profile>({
+		const state = getState<Profile>({
 			$name: 'profile', // this is not part of the state
 			$options: {}, // this is not part of the state
 			name: 'John',
@@ -156,10 +162,8 @@ describe('init state with initState<State>', () => {
 		});
 
 		expect(state).toEqual({
-			$init: {
-				name: 'John',
-				age: 30
-			}
+			name: 'John',
+			age: 30
 		});
 	});
 
@@ -171,7 +175,7 @@ describe('init state with initState<State>', () => {
 			anyVoid(): void;
 		}
 
-		const withAction = initState<Profile>({
+		const withAction = getState<Profile>({
 			anyVoid() {
 				// ...
 			},
@@ -181,11 +185,9 @@ describe('init state with initState<State>', () => {
 			}
 		});
 
-		expect(withAction).toEqual({
-			$init: {}
-		});
+		expect(withAction).toEqual({});
 
-		const withoutAction = initState<Profile>({
+		const withoutAction = getState<Profile>({
 			name: '',
 			rename(name: string) {
 				this.name = name;
@@ -196,9 +198,7 @@ describe('init state with initState<State>', () => {
 		});
 
 		expect(withoutAction).toEqual({
-			$init: {
-				name: ''
-			}
+			name: ''
 		});
 	});
 
@@ -208,8 +208,8 @@ describe('init state with initState<State>', () => {
 			age: number;
 		}
 
-		const profile = initState<Profile>({});
+		const profile = getState<Profile>({});
 
-		expect(profile).toEqual({ $init: {} });
+		expect(profile).toEqual({});
 	});
 });
