@@ -212,4 +212,15 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 
 		expect(profile).toEqual({});
 	});
+
+	it('case 8: only reference', () => {
+		interface Profile {
+			name: string;
+			age: number;
+		}
+
+		const profile = getState<Profile>({ name: 'John', age: 30 });
+
+		expect(profile).toEqual({ name: 'John', age: 30 });
+	});
 });
