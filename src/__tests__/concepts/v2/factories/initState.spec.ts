@@ -1,12 +1,6 @@
-import { getState } from './initState';
+import { analyzeMode, bindState } from './initState';
 
-describe('init state with initState<State>(slice: ExSlice<State>)', () => {
-	it('should ', () => {
-		//
-	});
-});
-
-describe('get state with getState<State>(slice: ExSlice<State>)', () => {
+describe(`bind state with bindState<State>(slice: ExSlice<State>): SharedState<State>['bind']`, () => {
 	it('case 1: only $init', () => {
 		interface Count {
 			$init: number;
@@ -16,7 +10,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			reset: () => void;
 		}
 
-		const state = getState<Count>({
+		const state = bindState<Count>({
 			$init: 0,
 			increase: () => {
 				// ...
@@ -46,7 +40,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			reset: () => void;
 		}
 
-		const state = getState<Count>({
+		const state = bindState<Count>({
 			$init: 0,
 			$name: 'count', // this is not part of the state
 			increase: () => {
@@ -79,7 +73,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			reset: () => void;
 		}
 
-		const state = getState<Count>({
+		const state = bindState<Count>({
 			$init: 0,
 			$options: {
 				// this is not part of the state
@@ -116,7 +110,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			reset: () => void;
 		}
 
-		const state = getState<Count>({
+		const state = bindState<Count>({
 			value: 0,
 			$name: 'count', // this is not part of the state
 			$options: {
@@ -150,7 +144,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			changeName: (name: string) => void;
 		}
 
-		const state = getState<Profile>({
+		const state = bindState<Profile>({
 			$name: 'profile', // this is not part of the state
 			$options: {}, // this is not part of the state
 			name: 'John',
@@ -175,7 +169,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			anyVoid(): void;
 		}
 
-		const withAction = getState<Profile>({
+		const withAction = bindState<Profile>({
 			anyVoid() {
 				// ...
 			},
@@ -187,7 +181,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 
 		expect(withAction).toEqual({});
 
-		const withoutAction = getState<Profile>({
+		const withoutAction = bindState<Profile>({
 			name: '',
 			rename(name: string) {
 				this.name = name;
@@ -208,7 +202,7 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			age: number;
 		}
 
-		const profile = getState<Profile>({});
+		const profile = bindState<Profile>({});
 
 		expect(profile).toEqual({});
 	});
@@ -219,8 +213,41 @@ describe('get state with getState<State>(slice: ExSlice<State>)', () => {
 			age: number;
 		}
 
-		const profile = getState<Profile>({ name: 'John', age: 30 });
+		const profile = bindState<Profile>({ name: 'John', age: 30 });
 
 		expect(profile).toEqual({ name: 'John', age: 30 });
+	});
+});
+
+describe('mode', () => {
+	it('should return primitive when $init is primitive', () => {
+		const slice = {
+			$init: 0
+		};
+
+		const mode = analyzeMode(slice);
+
+		expect(mode).toBe('primitive');
+	});
+
+	it('should return reference when $init is reference', () => {
+		const slice = {
+			$init: [0, 1, 2]
+		};
+
+		const mode = analyzeMode(slice);
+
+		expect(mode).toBe('reference');
+	});
+
+	it('should return reference when without $init', () => {
+		const slice = {
+			name: '',
+			age: ''
+		};
+
+		const mode = analyzeMode(slice);
+
+		expect(mode).toBe('reference');
 	});
 });

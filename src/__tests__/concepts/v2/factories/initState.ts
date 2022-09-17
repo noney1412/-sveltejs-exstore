@@ -5,22 +5,25 @@ interface SharedState<T> {
 	name: string;
 	bind: Partial<OnlyState<T>>;
 	mode: 'primitive' | 'reference';
+	get: any;
 }
 
 export function initState<State>(slice: ExSlice<State>) {
 	const state: SharedState<State> = {
 		name: 'anonymous',
 		bind: {},
-		mode: 'primitive'
+		mode: 'primitive', // default is primitive
+		get: slice.$init
 	};
 
-	state.bind = getState(slice);
-	state.mode = 'primitive';
+	state.bind = bindState(slice);
+	state.mode = analyzeMode(slice);
+	state.get = getState<State>(state);
 
 	return state;
 }
 
-export function getState<State>(slice: ExSlice<State>): SharedState<State>['bind'] {
+export function bindState<State>(slice: ExSlice<State>): SharedState<State>['bind'] {
 	const options: Array<keyof Extensions> = ['$name', '$options'];
 
 	const isNotFunctionAndNotOptions = (key: string, value: unknown) =>
@@ -36,8 +39,17 @@ export function getState<State>(slice: ExSlice<State>): SharedState<State>['bind
 }
 
 export function analyzeMode<State>(slice: ExSlice<State>): SharedState<State>['mode'] {
-	// if $init.$init is instance of object, then it is a reference.
-	// else then it is primitive.
+	if (slice.$init === undefined) return 'reference';
+	return slice.$init instanceof Object ? 'reference' : 'primitive';
+}
 
-	return slice;
+export function getState<State>(state: SharedState<State>) {
+	const bind = state.bind as any;
+	let init: any;
+
+	if (bind.$init !== undefined) {
+		init = bind.$init;
+	}
+	
+	return state.mode === 'primitive' ? init : state.bind;
 }
