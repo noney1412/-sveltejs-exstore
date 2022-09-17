@@ -1,4 +1,4 @@
-import type { Options } from './types/ExSlice';
+import type { Extensions } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
 
 interface Profile {
@@ -54,7 +54,7 @@ test('Key in Options', () => {
 		return key in obj;
 	}
 
-	const options: Options = {
+	const options: Extensions = {
 		$name: '',
 		$options: {}
 	};
