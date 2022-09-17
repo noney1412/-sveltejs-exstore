@@ -1,10 +1,10 @@
 import { writable } from 'svelte/store';
-import { initState } from './factories/initState';
+import { initSharedState } from './factories/initSharedState';
 import type { ExSlice } from './types/ExSlice';
 
 export function ex<State>(slice: ExSlice<State>) {
 	// extract state from slice.
-	const $state = initState(slice);
+	const $state = initSharedState(slice);
 
 	const store = writable(($state as any).$init);
 
