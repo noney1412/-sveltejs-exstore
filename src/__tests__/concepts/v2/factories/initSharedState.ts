@@ -44,7 +44,9 @@ export function analyzeMode<State>(slice: ExSlice<State>): SharedState<State>['m
 	return slice.$init instanceof Object ? 'reference' : 'primitive';
 }
 
-export function getInitialState<State>(state: SharedState<State>) {
+export function getInitialState<State>(
+	state: SharedState<State>
+): SharedState<State>['initialState'] {
 	const bind = state.bind as any;
 	let init: any;
 
