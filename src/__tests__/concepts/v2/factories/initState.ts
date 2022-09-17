@@ -1,8 +1,5 @@
-import type { Options } from '../types/ExSlice';
-import type { OnlyFunc, OnlyState } from '../types/Utils';
+import type { ExSlice, Options } from '../types/ExSlice';
 
-// draft: 1 exslice should support $init: {}
-type ExSlice<State> = OnlyFunc<State> & Partial<OnlyState<State>> & Partial<Options>;
 export function initState<State>(slice: ExSlice<State>) {
 	const options: Array<keyof Options> = ['$name', '$options'];
 
@@ -16,7 +13,7 @@ export function initState<State>(slice: ExSlice<State>) {
 	const flatten = filtered.reduce(
 		(acc, [key, value]) => {
 			if (key === '$init') {
-				acc.$init = value;
+				acc.$init = value as any;
 			} else {
 				acc.$init[key] = value;
 			}
