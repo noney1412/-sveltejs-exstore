@@ -11,10 +11,10 @@ interface SharedState<T> {
 
 export function initSharedState<State>(slice: ExSlice<State>) {
 	const state: SharedState<State> = {
-		name: 'anonymous',
+		name: '',
 		bind: {} as OnlyState<State>,
 		mode: 'primitive',
-		initialState: (slice as any).$init ?? undefined,
+		initialState: ({} as any).$init ?? undefined,
 		actions: {} as OnlyFunc<State>
 	};
 
