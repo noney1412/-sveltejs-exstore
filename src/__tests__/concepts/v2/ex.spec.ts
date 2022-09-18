@@ -15,7 +15,7 @@ const count = ex<Count>({
 	$name: 'count-store',
 	$init: 0,
 	increase() {
-		this.$init + 1;
+		this.$init += 1;
 	},
 	increaseBy(by) {
 		this.$init + by;

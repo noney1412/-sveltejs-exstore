@@ -158,14 +158,15 @@ test('Imply this to function', () => {
 	profile.changeName('new name');
 });
 
-test('Typecheck ExSlice<State>', () => {
+test('Typecheck ExSlice<State> for reference type', () => {
 	interface Profile {
-		name: string;
-		age: number;
+		name?: string;
+		age?: number;
 		changeName(name: string): void;
 	}
 
 	const profile: ExSlice<Profile> = {
+		name: 'John Doe',
 		changeName(name) {
 			this.name = name;
 		}
@@ -176,8 +177,8 @@ test('Typecheck ExSlice<State>', () => {
 	expect(profile.name).toBe('new name');
 
 	interface ProfileWithoutAction {
-		name: string;
-		age: number;
+		name?: string;
+		age?: number;
 	}
 
 	const profileWithOutAction: ExSlice<ProfileWithoutAction> = {};
@@ -187,4 +188,22 @@ test('Typecheck ExSlice<State>', () => {
 	profileWithOutAction.name = 'new name';
 
 	expect(profileWithOutAction.name).toBe('new name');
+});
+
+test('Typecheck ExSlice<State> for including $init', () => {
+	interface Count {
+		$init: number;
+		increase(): void;
+	}
+
+	const count: ExSlice<Count> = {
+		$init: 0,
+		increase() {
+			this.$init++;
+		}
+	};
+
+	count.increase();
+
+	expect(count.$init).toBe(1);
 });

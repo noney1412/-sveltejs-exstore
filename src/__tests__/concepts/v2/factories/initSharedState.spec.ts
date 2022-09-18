@@ -170,6 +170,10 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 		}
 
 		const withAction = bindState<Profile>({
+			$name: 'profile', // this is not part of the state
+			$options: {}, // this is not part of the state
+			name: 'John',
+			age: 30,
 			anyVoid() {
 				// ...
 			},
@@ -183,6 +187,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 
 		const withoutAction = bindState<Profile>({
 			name: '',
+			age: 0,
 			rename(name: string) {
 				this.name = name;
 			},
@@ -198,8 +203,8 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 
 	it('case 7: without actions', () => {
 		interface Profile {
-			name: string;
-			age: number;
+			name?: string;
+			age?: number;
 		}
 
 		const profile = bindState<Profile>({});

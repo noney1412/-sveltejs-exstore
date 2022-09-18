@@ -12,8 +12,8 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 	const state: SharedState<State> = {
 		name: 'anonymous',
 		bind: {},
-		mode: 'primitive', // default is primitive
-		initialState: slice.$init
+		mode: 'primitive',
+		initialState: (slice as any).$init ?? undefined
 	};
 
 	state.name = slice.$name || 'anonymous_' + uuid();
@@ -40,8 +40,8 @@ export function bindState<State>(slice: ExSlice<State>): SharedState<State>['bin
 }
 
 export function analyzeMode<State>(slice: ExSlice<State>): SharedState<State>['mode'] {
-	if (slice.$init === undefined) return 'reference';
-	return slice.$init instanceof Object ? 'reference' : 'primitive';
+	if ((slice as any).$init === undefined) return 'reference';
+	return (slice as any).$init instanceof Object ? 'reference' : 'primitive';
 }
 
 export function getInitialState<State>(
