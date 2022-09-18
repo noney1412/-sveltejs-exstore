@@ -183,7 +183,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			}
 		});
 
-		expect(withAction).toEqual({});
+		expect(withAction).toEqual({ name: 'John', age: 30 });
 
 		const withoutAction = bindState<Profile>({
 			name: '',
@@ -197,7 +197,8 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 		});
 
 		expect(withoutAction).toEqual({
-			name: ''
+			name: '',
+			age: 0
 		});
 	});
 

@@ -4,8 +4,4 @@ export interface Extensions {
 	$options: Record<string, unknown>;
 }
 
-export interface Init<State> {
-	$init: State;
-}
-
 export type ExSlice<State> = OnlyState<State> & ImplyThis<State> & Partial<Extensions>;

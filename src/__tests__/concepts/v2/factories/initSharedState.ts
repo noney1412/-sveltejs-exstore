@@ -5,7 +5,7 @@ interface SharedState<T> {
 	name: string;
 	bind: Partial<OnlyState<T>>;
 	mode: 'primitive' | 'reference';
-	initialState: Partial<OnlyState<T>> extends { $init: infer U } ? U : Partial<OnlyState<T>>;
+	initialState: OnlyState<T> extends { $init: infer U } ? U : OnlyState<T>;
 }
 
 export function initSharedState<State>(slice: ExSlice<State>) {
@@ -19,7 +19,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 	state.name = slice.$name || 'anonymous_' + uuid();
 	state.bind = bindState(slice);
 	state.mode = analyzeMode(slice);
-	state.initialState = getInitialState<State>(state);
+	state.initialState = getInitialState(state);
 
 	return state;
 }
