@@ -19,7 +19,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 	};
 
 	state.name = slice.$name || 'anonymous_' + uuid();
-	state.bind = bindState(slice);
+	state.bind = getOnlyStateFormSlice(slice);
 	state.mode = analyzeMode(slice);
 	state.initialState = getInitialState(state);
 	state.actions = bindActions(state.bind, slice);
@@ -27,7 +27,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 	return state;
 }
 
-export function bindState<State>(slice: ExSlice<State>): SharedState<State>['bind'] {
+export function getOnlyStateFormSlice<State>(slice: ExSlice<State>): SharedState<State>['bind'] {
 	const options: Array<keyof Extensions> = ['$name', '$options'];
 
 	const isNotFunctionAndNotOptions = (key: string, value: unknown) =>
