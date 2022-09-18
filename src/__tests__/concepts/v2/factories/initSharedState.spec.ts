@@ -1,4 +1,5 @@
-import { analyzeMode, bindState, getInitialState } from './initSharedState';
+import type { OnlyState } from '../types/Utils';
+import { analyzeMode, bindActions, bindState, getInitialState } from './initSharedState';
 
 describe(`The state to be bound to an action is called "bind."`, () => {
 	it('case 1: only $init', () => {
@@ -294,5 +295,51 @@ describe('The state that will be passed to the storage is initialState.', () => 
 		const init = getInitialState<any>(state as any);
 
 		expect(init).toEqual({ name: 'John', age: 30 });
+	});
+});
+
+describe('bind actions', () => {
+	interface Count {
+		$init: number;
+		increase: () => void;
+		decrease: () => void;
+		reset: () => void;
+	}
+
+	const countSlice: Count = {
+		$init: 0,
+		increase() {
+			this.$init += 1;
+		},
+		decrease() {
+			this.$init -= 1;
+		},
+		reset() {
+			this.$init = 0;
+		}
+	};
+
+	it('should return only functions from bindAction(state, slice)', () => {
+		const actions = bindActions({} as OnlyState<Count>, countSlice);
+
+		expect(actions).toEqual({
+			increase: expect.any(Function),
+			decrease: expect.any(Function),
+			reset: expect.any(Function)
+		});
+	});
+
+	it('should bind object with all actions', () => {
+		const bind: OnlyState<Count> = bindState(countSlice);
+		
+		const actions = bindActions(bind, countSlice);
+		
+		actions.increase();
+
+		expect(bind.$init).toBe(1);
+	});
+
+	it('state in the countSlice should be the same', () => {
+		expect(countSlice.$init).toBe(0);
 	});
 });

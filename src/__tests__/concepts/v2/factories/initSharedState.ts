@@ -1,25 +1,28 @@
 import type { ExSlice, Extensions } from '../types/ExSlice';
-import type { OnlyState } from '../types/Utils';
+import type { OnlyFunc, OnlyState } from '../types/Utils';
 import uuid from 'uuid-random';
 interface SharedState<T> {
 	name: string;
-	bind: Partial<OnlyState<T>>;
+	bind: OnlyState<T>;
 	mode: 'primitive' | 'reference';
 	initialState: OnlyState<T> extends { $init: infer U } ? U : OnlyState<T>;
+	actions: OnlyFunc<T>;
 }
 
 export function initSharedState<State>(slice: ExSlice<State>) {
 	const state: SharedState<State> = {
 		name: 'anonymous',
-		bind: {},
+		bind: {} as OnlyState<State>,
 		mode: 'primitive',
-		initialState: (slice as any).$init ?? undefined
+		initialState: (slice as any).$init ?? undefined,
+		actions: {} as OnlyFunc<State>
 	};
 
 	state.name = slice.$name || 'anonymous_' + uuid();
 	state.bind = bindState(slice);
 	state.mode = analyzeMode(slice);
 	state.initialState = getInitialState(state);
+	state.actions = bindActions(state.bind, slice);
 
 	return state;
 }
@@ -55,4 +58,14 @@ export function getInitialState<State>(
 	}
 
 	return state.mode === 'primitive' ? init : state.bind;
+}
+
+export function bindActions<State>(bind: SharedState<State>['bind'], slice: ExSlice<State>) {
+	const actions = Object.entries(slice).filter(([, value]) => typeof value === 'function');
+
+	//Fix type later.
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	const bound = actions.map(([key, value]) => [key, (value as unknown as Function).bind(bind)]);
+
+	return Object.fromEntries(bound) as OnlyFunc<State>;
 }

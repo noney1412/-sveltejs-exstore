@@ -6,7 +6,7 @@ export function ex<State>(slice: ExSlice<State>) {
 	// extract state from slice.
 	const state = initSharedState(slice);
 
-	const store = writable<typeof state.initialState>(state.initialState);
+	const store = writable(state.initialState);
 
 	return store;
 }
