@@ -10,3 +10,6 @@ export type OnlyFunc<T> = Pick<T, OnlyFuncKeys<T>>;
 export type OnlyValue<T> = Omit<T, OnlyFuncKeys<T>>;
 
 export type OnlyState<T> = Omit<OnlyValue<T>, keyof Extensions>;
+export type ImplyThis<T> = {
+	[K in keyof T]: T[K] extends (...args: infer P) => infer R ? (this: T, ...args: P) => R : T[K];
+};

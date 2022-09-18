@@ -1,4 +1,5 @@
-import { analyzeMode, bindState, getInitialState } from './initSharedState';
+import type { OnlyState } from '../types/Utils';
+import { analyzeMode, bindActions, getOnlyStateFormSlice, getInitialState } from './initSharedState';
 
 describe(`The state to be bound to an action is called "bind."`, () => {
 	it('case 1: only $init', () => {
@@ -10,7 +11,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			reset: () => void;
 		}
 
-		const state = bindState<Count>({
+		const state = getOnlyStateFormSlice<Count>({
 			$init: 0,
 			increase: () => {
 				// ...
@@ -40,7 +41,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			reset: () => void;
 		}
 
-		const state = bindState<Count>({
+		const state = getOnlyStateFormSlice<Count>({
 			$init: 0,
 			$name: 'count', // this is not part of the state
 			increase: () => {
@@ -73,7 +74,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			reset: () => void;
 		}
 
-		const state = bindState<Count>({
+		const state = getOnlyStateFormSlice<Count>({
 			$init: 0,
 			$options: {
 				// this is not part of the state
@@ -110,7 +111,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			reset: () => void;
 		}
 
-		const state = bindState<Count>({
+		const state = getOnlyStateFormSlice<Count>({
 			value: 0,
 			$name: 'count', // this is not part of the state
 			$options: {
@@ -144,7 +145,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			changeName: (name: string) => void;
 		}
 
-		const state = bindState<Profile>({
+		const state = getOnlyStateFormSlice<Profile>({
 			$name: 'profile', // this is not part of the state
 			$options: {}, // this is not part of the state
 			name: 'John',
@@ -169,7 +170,11 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			anyVoid(): void;
 		}
 
-		const withAction = bindState<Profile>({
+		const withAction = getOnlyStateFormSlice<Profile>({
+			$name: 'profile', // this is not part of the state
+			$options: {}, // this is not part of the state
+			name: 'John',
+			age: 30,
 			anyVoid() {
 				// ...
 			},
@@ -179,10 +184,11 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			}
 		});
 
-		expect(withAction).toEqual({});
+		expect(withAction).toEqual({ name: 'John', age: 30 });
 
-		const withoutAction = bindState<Profile>({
+		const withoutAction = getOnlyStateFormSlice<Profile>({
 			name: '',
+			age: 0,
 			rename(name: string) {
 				this.name = name;
 			},
@@ -192,17 +198,18 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 		});
 
 		expect(withoutAction).toEqual({
-			name: ''
+			name: '',
+			age: 0
 		});
 	});
 
 	it('case 7: without actions', () => {
 		interface Profile {
-			name: string;
-			age: number;
+			name?: string;
+			age?: number;
 		}
 
-		const profile = bindState<Profile>({});
+		const profile = getOnlyStateFormSlice<Profile>({});
 
 		expect(profile).toEqual({});
 	});
@@ -213,7 +220,7 @@ describe(`The state to be bound to an action is called "bind."`, () => {
 			age: number;
 		}
 
-		const profile = bindState<Profile>({ name: 'John', age: 30 });
+		const profile = getOnlyStateFormSlice<Profile>({ name: 'John', age: 30 });
 
 		expect(profile).toEqual({ name: 'John', age: 30 });
 	});
@@ -288,5 +295,51 @@ describe('The state that will be passed to the storage is initialState.', () => 
 		const init = getInitialState<any>(state as any);
 
 		expect(init).toEqual({ name: 'John', age: 30 });
+	});
+});
+
+describe('bind actions', () => {
+	interface Count {
+		$init: number;
+		increase: () => void;
+		decrease: () => void;
+		reset: () => void;
+	}
+
+	const countSlice: Count = {
+		$init: 0,
+		increase() {
+			this.$init += 1;
+		},
+		decrease() {
+			this.$init -= 1;
+		},
+		reset() {
+			this.$init = 0;
+		}
+	};
+
+	it('should return only functions from bindAction(state, slice)', () => {
+		const actions = bindActions({} as OnlyState<Count>, countSlice);
+
+		expect(actions).toEqual({
+			increase: expect.any(Function),
+			decrease: expect.any(Function),
+			reset: expect.any(Function)
+		});
+	});
+
+	it('should bind object with all actions', () => {
+		const bind: OnlyState<Count> = getOnlyStateFormSlice(countSlice);
+		
+		const actions = bindActions(bind, countSlice);
+		
+		actions.increase();
+
+		expect(bind.$init).toBe(1);
+	});
+
+	it('state in the countSlice should be the same', () => {
+		expect(countSlice.$init).toBe(0);
 	});
 });

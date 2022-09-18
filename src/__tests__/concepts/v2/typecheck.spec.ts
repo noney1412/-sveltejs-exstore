@@ -1,4 +1,4 @@
-import type { Extensions } from './types/ExSlice';
+import type { ExSlice, Extensions } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
 
 interface Profile {
@@ -91,7 +91,7 @@ test('Bind this from $state to $actions', () => {
 	expect($state.age).toBe(30);
 });
 
-test('infer undefined', () => {
+test('Infer undefined', () => {
 	type CanBeUndefined<T> = T extends undefined ? true : false;
 
 	const t1: CanBeUndefined<undefined> = true;
@@ -103,7 +103,7 @@ test('infer undefined', () => {
 	expect(t2).toBe(false);
 });
 
-test('infer $init', () => {
+test('Infer $init', () => {
 	type WithInit<T> = T extends { $init: infer U } ? U : never;
 
 	type Profile = {
@@ -114,4 +114,96 @@ test('infer $init', () => {
 	const t1: WithInit<Profile> = 'John Doe';
 
 	expect(t1).toBe('John Doe');
+});
+
+test('All or Nothing type', () => {
+	interface Profile {
+		name: string;
+		age: number;
+	}
+
+	type AllOrNothing<T> =
+		| T
+		| {
+				[k in keyof Required<T>]?: never;
+		  };
+
+	const slice: AllOrNothing<Profile> = {
+		name: 'John Doe',
+		age: 20
+	};
+
+	expect(slice.name).toBe('John Doe');
+});
+
+test('Imply this to function', () => {
+	interface Profile {
+		name: string;
+		age: number;
+		changeName(name: string): void;
+	}
+
+	type ImplyThis<T> = {
+		[K in keyof T]: T[K] extends (...args: infer P) => infer R ? (this: T, ...args: P) => R : T[K];
+	};
+
+	const profile: ImplyThis<Profile> = {
+		name: '',
+		age: 0,
+		changeName(name) {
+			this.name = name;
+		}
+	};
+
+	profile.changeName('new name');
+});
+
+test('Typecheck ExSlice<State> for reference type', () => {
+	interface Profile {
+		name?: string;
+		age?: number;
+		changeName(name: string): void;
+	}
+
+	const profile: ExSlice<Profile> = {
+		name: 'John Doe',
+		changeName(name) {
+			this.name = name;
+		}
+	};
+
+	profile.changeName('new name');
+
+	expect(profile.name).toBe('new name');
+
+	interface ProfileWithoutAction {
+		name?: string;
+		age?: number;
+	}
+
+	const profileWithOutAction: ExSlice<ProfileWithoutAction> = {};
+
+	expect(profileWithOutAction.name).toBeUndefined();
+
+	profileWithOutAction.name = 'new name';
+
+	expect(profileWithOutAction.name).toBe('new name');
+});
+
+test('Typecheck ExSlice<State> for including $init', () => {
+	interface Count {
+		$init: number;
+		increase(): void;
+	}
+
+	const count: ExSlice<Count> = {
+		$init: 0,
+		increase() {
+			this.$init++;
+		}
+	};
+
+	count.increase();
+
+	expect(count.$init).toBe(1);
 });
