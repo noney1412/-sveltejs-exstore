@@ -19,7 +19,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 	state.name = slice.$name || 'anonymous_' + uuid();
 	state.bind = getOnlyStateFormSlice(slice);
 	state.mode = analyzeMode(slice);
-	state.initialState = getInitialState(state);
+	state.initialState = getCurrentState(state);
 
 	return state;
 }
@@ -44,7 +44,7 @@ export function analyzeMode<State>(slice: ExSlice<State>): SharedState<State>['m
 	return (slice as any).$init instanceof Object ? 'reference' : 'primitive';
 }
 
-export function getInitialState<State>(
+export function getCurrentState<State>(
 	state: SharedState<State>
 ): SharedState<State>['initialState'] {
 	const bind = state.bind as any;
