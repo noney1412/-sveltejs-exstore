@@ -6,7 +6,6 @@ interface SharedState<T> {
 	bind: OnlyState<T>;
 	mode: 'primitive' | 'reference';
 	initialState: OnlyState<T> extends { $init: infer U } ? U : OnlyState<T>;
-	actions: OnlyFunc<T>;
 }
 
 export function initSharedState<State>(slice: ExSlice<State>) {
@@ -14,15 +13,13 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 		name: '',
 		bind: {} as OnlyState<State>,
 		mode: 'primitive',
-		initialState: ({} as any).$init ?? undefined,
-		actions: {} as OnlyFunc<State>
+		initialState: ({} as any).$init ?? undefined
 	};
 
 	state.name = slice.$name || 'anonymous_' + uuid();
 	state.bind = getOnlyStateFormSlice(slice);
 	state.mode = analyzeMode(slice);
 	state.initialState = getInitialState(state);
-	state.actions = bindActions(state.bind, slice);
 
 	return state;
 }
