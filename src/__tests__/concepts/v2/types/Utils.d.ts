@@ -1,4 +1,4 @@
-import type { Options } from './ExSlice.d';
+import type { Extensions } from './ExSlice.d';
 export type Nullable<T> = T & undefined & null;
 
 export type OnlyFuncKeys<T> = {
@@ -9,4 +9,7 @@ export type OnlyFunc<T> = Pick<T, OnlyFuncKeys<T>>;
 
 export type OnlyValue<T> = Omit<T, OnlyFuncKeys<T>>;
 
-export type OnlyState<T> = Omit<OnlyValue<T>, keyof Options>;
+export type OnlyState<T> = Omit<OnlyValue<T>, keyof Extensions>;
+export type ImplyThis<T> = {
+	[K in keyof T]: T[K] extends (...args: infer P) => infer R ? (this: T, ...args: P) => R : T[K];
+};

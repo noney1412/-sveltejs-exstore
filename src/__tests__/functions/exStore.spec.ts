@@ -318,7 +318,7 @@ test('stage 9: immutable reference ', () => {
 
 	const unsubscribe = profile.subscribe((value) => {
 		console.log('stage 9: immutable reference', value);
-		
+
 		// FIXME: this should not work
 		value.name = 'Jane';
 	});
