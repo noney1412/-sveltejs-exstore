@@ -1,5 +1,7 @@
-import { Writable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import { initSharedState, bindActions, getCurrentState } from './initSharedState';
+import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
 import type { OnlyState, OnlyFunc, Nullable } from './types/Utils';
@@ -63,6 +65,8 @@ function ex<State>(slice: ExSlice<State>) {
 		return acc;
 	}, {}) as OnlyFunc<State>;
 
+	applyMiddleware();
+
 	return {
 		subscribe: store.subscribe,
 		set: wrappedSet,
@@ -82,6 +86,12 @@ function ex<State>(slice: ExSlice<State>) {
 			state.bind = value as OnlyState<State>;
 		}
 		store.set(value);
+	}
+
+	function applyMiddleware() {
+		middleware.subscribe((m) => {
+			withReduxDevtool<WritableState<InitialState>>(m);
+		});
 	}
 }
 
