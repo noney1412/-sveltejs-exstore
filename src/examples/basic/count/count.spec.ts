@@ -5,16 +5,16 @@ import Count from './Count.svelte';
 
 test('increase the number', () => {
 	interface Count {
-		$initialValue: number;
+		$init: number;
 		increase: () => void;
 	}
 
 	const count = exStore<Count>({
-		name: 'count',
-		initialValue: 0,
-		actions: (state) => ({
-			increase: () => state.current + 1
-		})
+		$name: 'count',
+		$init: 0,
+		increase: function () {
+			this.$init + 1;
+		}
 	});
 
 	expect(get(count)).toBe(0);

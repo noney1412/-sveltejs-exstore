@@ -1,165 +1,67 @@
-import { get, writable } from 'svelte/store';
-import withReduxDevtool from './middlewares/withReduxDevtools';
-import type { Middleware } from './types/ExMiddleware';
-import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
-import type { Nullable, OnlyFunc } from './types/utils';
+import { Writable, writable } from 'svelte/store';
+import { initSharedState, bindActions, getCurrentState } from './initSharedState';
+import type { ExSlice } from './types/ExSlice';
+import type { OnlyState, OnlyFunc } from './types/Utils';
 
-function exStore<State>(slice: ExSlice<State>) {
-	const store = writable<InitialValue<State>>(slice.initialValue as InitialValue<State>);
+type WritableState<T> = T | Record<string, T>;
 
-	let state: ExState<State> = {} as ExState<State>;
-	type WrappedAction = OnlyFunc<State> & {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		[key: string]: any;
-	};
+function ex<State>(slice: ExSlice<State>) {
+	const state = initSharedState(slice);
 
-	const actions = slice.actions?.(defineState()) as WrappedAction;
+	const actions = bindActions(state.bind, slice);
 
-	const middleware = writable<Middleware<InitialValue<State>>>({
-		storeName: slice.name,
-		initialState: slice.initialValue as InitialValue<State>,
-		previousState: undefined as Nullable<InitialValue<State>>,
-		currentState: undefined as Nullable<InitialValue<State>>,
-		currentActionName: '',
-		store: {
-			subscribe: store.subscribe,
-			set: (x: InitialValue<State> | Record<string, never>) => {
-				setState<State>(x, store, state);
-			},
-			update: store.update
-		},
-		trace: '',
-		defaultTrace: new Error().stack
-	});
+	const store = writable<WritableState<typeof state.initialState>>(state.initialState);
 
-	const wrapMiddlewareStore = {
-		set: (x: InitialValue<State> | Record<string, never>) => {
-			const m = get(middleware);
-			m.currentActionName = 'set';
-			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			setState<State>(x, store, state);
-			m.trace = getTrace();
-			m.currentState = get(store) as Nullable<InitialValue<State>>;
-			middleware.set(m);
-		},
-		update: (fn: (x: InitialValue<State>) => InitialValue<State>) => {
-			const m = get(middleware);
-			m.currentActionName = 'update';
-			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			store.update(fn);
-			m.trace = getTrace();
-			m.currentState = get(store) as Nullable<InitialValue<State>>;
-			middleware.set(m);
+	const wrappedSet = (value: WritableState<typeof state.initialState>) => {
+		if (state.mode === 'primitive') {
+			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
+		} else {
+			state.bind = value as OnlyState<State>;
 		}
+		store.set(value);
 	};
 
-	wrapAction();
-	applyMiddleware();
+	const wrappedUpdate = (fn: (value: typeof state.initialState) => typeof state.initialState) => {
+		const value = fn(getCurrentState(state)) as WritableState<typeof state.initialState>;
+		wrappedSet(value);
+	};
+
+	const boundActions = Object.keys(actions).reduce((acc, key) => {
+		const fn = actions[key];
+		acc[key] = function (...args: unknown[]) {
+			beforeUpdateSate();
+			updateState();
+			afterUpdateSate();
+
+			function beforeUpdateSate() {
+				//..
+			}
+
+			function updateState() {
+				store.update((prev) => {
+					fn.apply(prev, args);
+					const newState = getCurrentState(state);
+					return newState;
+				});
+			}
+
+			function afterUpdateSate() {
+				//..
+			}
+		};
+		return acc;
+	}, {}) as OnlyFunc<State>;
 
 	return {
 		subscribe: store.subscribe,
-		update: wrapMiddlewareStore.update,
-		set: wrapMiddlewareStore.set,
-		...actions
-	};
-
-	/**
-	 * Define state if the initial value is primitive or reference type
-	 * - Primitive type: number, string, boolean, null, undefined
-	 * - Reference type: object, array, function
-	 * if the initial value is a primitive type, the state will be `{ current: initialValue }`
-	 * if the initial value is a reference type, the state will be `initialValue`
-	 */
-	function defineState() {
-		if (slice.initialValue instanceof Object) {
-			state = slice.initialValue as ExState<State>;
-		} else {
-			state = {
-				current: slice.initialValue
-			} as ExState<State>;
-		}
-
-		return state;
-	}
-
-	/**
-	 * Wrap all action functions in order to custom update behavior.
-	 * (only primitive type) If the action function returns a value, the store will be updated with the returned value.
-	 * (only primitive type) state.current will be updated with the returned value.
-	 * (reference type) no value returned. state will be updated within the actions.
-	 */
-	function wrapAction() {
-		if (actions && actions instanceof Object) {
-			for (const key in actions) {
-				const fn = actions[key] as (...args: unknown[]) => void | InitialValue<State>;
-				actions[key as keyof WrappedAction] = function (...args: unknown[]) {
-					const m = get(middleware);
-
-					beforeUpdateState();
-					updateState();
-					afterUpdateState();
-
-					function beforeUpdateState() {
-						m.previousState = get(store) as Nullable<InitialValue<State>>;
-					}
-
-					function updateState() {
-						store.update((current) => {
-							if (current instanceof Object) {
-								fn(...args);
-								m.trace = getTrace();
-
-								// the current is here (reference type)
-								return state as InitialValue<State>;
-							} else {
-								state.current = fn(...args) as InitialValue<State>;
-								m.trace = getTrace();
-
-								// the current is here (primitive type)
-								return state.current;
-							}
-						});
-					}
-
-					function afterUpdateState() {
-						m.currentActionName = key;
-						m.currentState = get(store) as Nullable<InitialValue<State>>;
-						middleware.set(m);
-					}
-				};
-			}
-		}
-	}
-
-	function getTrace() {
-		const stack = new Error().stack?.split('\n');
-		const svelte = stack?.filter((x) => x.includes('.svelte')) ?? [];
-		const store = [get(middleware).defaultTrace?.split('\n').at(-1)] ?? [];
-		const trace = [stack?.at(0), ...svelte, ...store].join('\n');
-		return trace;
-	}
-
-	/**
-	 * subscribe the middlewaretore to apply middlewares.
-	 */
-	function applyMiddleware() {
-		middleware.subscribe((m) => {
-			withReduxDevtool<InitialValue<State>>(m);
-		});
-	}
-
-	function setState<State>(
-		x: InitialValue<State> | Record<string, never>,
-		store,
-		state: ExState<State>
-	) {
-		if (x instanceof Object) {
-			store.set(x as InitialValue<State>);
-		} else {
-			state.current = x;
-			store.set(state.current);
-		}
-	}
+		set: wrappedSet,
+		update: wrappedUpdate,
+		...boundActions
+	} as OnlyFunc<State> &
+		Writable<typeof state.initialState> & {
+			set: (value: WritableState<typeof state.initialState>) => void;
+			update: (fn: (value: typeof state.initialState) => typeof state.initialState) => void;
+		};
 }
 
-export default exStore;
+export default ex;

@@ -13,8 +13,8 @@
 		bg="red-400"
 		border="rounded-xl"
 	>
-		<h1 data-testid="display-name">{$profile.name ?? ''}</h1>
-		<h2 data-testid="display-age">{$profile.age ?? ''}</h2>
+		<h1 data-testid="display-name">{$profile.name}</h1>
+		<h2 data-testid="display-age">{$profile.age}</h2>
 	</div>
 
 	<div class="row-container" flex="~" gap="12px">
