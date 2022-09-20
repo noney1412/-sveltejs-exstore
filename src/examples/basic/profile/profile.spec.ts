@@ -1,18 +1,5 @@
-import { get } from 'svelte/store';
 import { render, fireEvent, screen } from '@testing-library/svelte';
 import Profile from './Profile.svelte';
-import { profile } from './profile';
-
-test('change profile name.', () => {
-	profile.changeName('Sam Wilson');
-	profile.update((state) => {
-		state.age = 30;
-		return state;
-	});
-
-	expect(get(profile).name).toBe('Sam Wilson');
-	expect(get(profile).age).toBe(30);
-});
 
 test('render <Profile /> and bind input with store.', async () => {
 	render(Profile);
