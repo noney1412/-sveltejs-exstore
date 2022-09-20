@@ -1,7 +1,8 @@
 import { Writable, writable } from 'svelte/store';
 import { initSharedState, bindActions, getCurrentState } from './initSharedState';
+import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
-import type { OnlyState, OnlyFunc } from './types/Utils';
+import type { OnlyState, OnlyFunc, Nullable } from './types/Utils';
 
 type WritableState<T> = T | Record<string, T>;
 
@@ -10,18 +11,28 @@ function ex<State>(slice: ExSlice<State>) {
 
 	const actions = bindActions(state.bind, slice);
 
-	const store = writable<WritableState<typeof state.initialState>>(state.initialState);
+	type InitialState = typeof state.initialState;
 
-	const wrappedSet = (value: WritableState<typeof state.initialState>) => {
-		if (state.mode === 'primitive') {
-			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
-		} else {
-			state.bind = value as OnlyState<State>;
-		}
-		store.set(value);
-	};
+	const store = writable<WritableState<InitialState>>(state.initialState);
 
-	const wrappedUpdate = (fn: (value: typeof state.initialState) => typeof state.initialState) => {
+	const middleware = writable<ExMiddleware<WritableState<InitialState>>>({
+		storeName: state.name,
+		initialState: state.initialState,
+		previousState: undefined as Nullable<InitialState>,
+		currentState: undefined as Nullable<InitialState>,
+		currentActionName: '',
+		store: {
+			subscribe: store.subscribe,
+			set: setState,
+			update: store.update
+		},
+		trace: '',
+		defaultTrace: ''
+	});
+
+	const wrappedSet = setState;
+
+	const wrappedUpdate = (fn: (value: InitialState) => InitialState) => {
 		const value = fn(getCurrentState(state)) as WritableState<typeof state.initialState>;
 		wrappedSet(value);
 	};
@@ -58,10 +69,20 @@ function ex<State>(slice: ExSlice<State>) {
 		update: wrappedUpdate,
 		...boundActions
 	} as OnlyFunc<State> &
-		Writable<typeof state.initialState> & {
-			set: (value: WritableState<typeof state.initialState>) => void;
-			update: (fn: (value: typeof state.initialState) => typeof state.initialState) => void;
+		Writable<InitialState> & {
+			set: (value: WritableState<InitialState>) => void;
+			update: (fn: (value: InitialState) => InitialState) => void;
 		};
+
+	/* --- Inner functions --- */
+	function setState(value: WritableState<InitialState>) {
+		if (state.mode === 'primitive') {
+			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
+		} else {
+			state.bind = value as OnlyState<State>;
+		}
+		store.set(value);
+	}
 }
 
 export default ex;
