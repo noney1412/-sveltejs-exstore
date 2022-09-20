@@ -12,6 +12,5 @@ export const profile = ex<Profile>({
 	age: undefined,
 	changeName(name: string) {
 		this.name = name;
-		debugger;
 	}
 });
