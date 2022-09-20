@@ -51,12 +51,8 @@ function ex<State>(slice: ExSlice<State>) {
 			}
 
 			function updateState() {
-				store.update((prev) => {
-					fn.apply(state.bind, args);
-					const newState = getCurrentState(state);
-					debugger;
-					return newState;
-				});
+				fn(...args);
+				store.set(getCurrentState(state));
 			}
 
 			function afterUpdateSate() {
@@ -85,7 +81,6 @@ function ex<State>(slice: ExSlice<State>) {
 			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
 		}
 
-		debugger;
 		store.set(value);
 	}
 
