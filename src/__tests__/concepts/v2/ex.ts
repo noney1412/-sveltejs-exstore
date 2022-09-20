@@ -1,7 +1,7 @@
 import { Writable, writable } from 'svelte/store';
 import { bindActions, getCurrentState, initSharedState } from './factories/initSharedState';
 import type { ExSlice } from './types/ExSlice';
-import type { OnlyFunc } from './types/Utils';
+import type { OnlyFunc, OnlyState } from './types/Utils';
 
 export function ex<State>(slice: ExSlice<State>) {
 	const state = initSharedState(slice);
@@ -12,9 +12,9 @@ export function ex<State>(slice: ExSlice<State>) {
 
 	const wrappedSet = (value: typeof state.initialState) => {
 		if (state.mode === 'primitive') {
-			(state as any).bind.$init = value;
+			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
 		} else {
-			(state as any).bind = value;
+			state.bind = value as OnlyState<State>;
 		}
 		store.set(value);
 	};
