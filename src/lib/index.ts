@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { initSharedState, bindActions, getCurrentState } from './initSharedState';
 import withReduxDevtool from './middlewares/withReduxDevtools';
@@ -29,25 +29,41 @@ function ex<State>(slice: ExSlice<State>) {
 			update: store.update
 		},
 		trace: '',
-		defaultTrace: ''
+		defaultTrace: new Error().stack
 	});
 
-	const wrappedSet = setState;
+	const wrappedSet = (value: WritableState<InitialState>) => {
+		const m = get(middleware);
+		m.currentActionName = 'set';
+		m.previousState = get(store) as Nullable<InitialState>;
+		setState(value);
+		m.currentState = get(store) as Nullable<InitialState>;
+		m.trace = getOnlySvelteTrace();
+		middleware.set(m);
+	};
 
 	const wrappedUpdate = (fn: (value: InitialState) => InitialState) => {
+		const m = get(middleware);
+		m.currentActionName = 'update';
+		m.previousState = get(store) as Nullable<InitialState>;
 		const value = fn(getCurrentState(state));
 		wrappedSet(value);
+		m.currentState = get(store) as Nullable<InitialState>;
+		m.trace = getOnlySvelteTrace();
+		middleware.set(m);
 	};
 
 	const boundActions = Object.keys(actions).reduce((acc, key) => {
 		const fn = actions[key];
 		acc[key] = function (...args: unknown[]) {
+			const m = get(middleware);
 			beforeUpdateSate();
 			updateState();
 			afterUpdateSate();
 
 			function beforeUpdateSate() {
-				//..
+				m.previousState = get(store) as Nullable<InitialState>;
+				m.currentActionName = key;
 			}
 
 			function updateState() {
@@ -56,7 +72,9 @@ function ex<State>(slice: ExSlice<State>) {
 			}
 
 			function afterUpdateSate() {
-				//..
+				m.currentState = get(store) as Nullable<InitialState>;
+				m.trace = getOnlySvelteTrace();
+				middleware.set(m);
 			}
 		};
 		return acc;
@@ -88,6 +106,14 @@ function ex<State>(slice: ExSlice<State>) {
 		middleware.subscribe((m) => {
 			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
 		});
+	}
+
+	function getOnlySvelteTrace() {
+		const stack = new Error().stack?.split('\n');
+		const svelte = stack?.filter((x) => x.includes('.svelte')) ?? [];
+		const store = [get(middleware).defaultTrace?.split('\n').at(-1)] ?? [];
+		const trace = [stack?.at(0), ...svelte, ...store].join('\n');
+		return trace;
 	}
 }
 
