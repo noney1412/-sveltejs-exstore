@@ -10,6 +10,20 @@ export function ex<State>(slice: ExSlice<State>) {
 
 	const store = writable(state.initialState);
 
+	const wrappedSet = (value: typeof state.initialState) => {
+		if (state.mode === 'primitive') {
+			(state as any).bind.$init = value;
+		} else {
+			(state as any).bind = value;
+		}
+		store.set(value);
+	};
+
+	const wrappedUpdate = (fn: (value: typeof state.initialState) => typeof state.initialState) => {
+		const value = fn(getCurrentState(state));
+		wrappedSet(value);
+	};
+
 	const boundActions = Object.keys(actions).reduce((acc, key) => {
 		const fn = actions[key];
 		acc[key] = function (...args: unknown[]) {
@@ -36,6 +50,10 @@ export function ex<State>(slice: ExSlice<State>) {
 		return acc;
 	}, {}) as OnlyFunc<State>;
 
-	return { ...store, ...boundActions, ...state } as OnlyFunc<State> &
-		Writable<typeof state.initialState>;
+	return {
+		subscribe: store.subscribe,
+		set: wrappedSet,
+		update: wrappedUpdate,
+		...boundActions
+	} as OnlyFunc<State> & Writable<typeof state.initialState>;
 }

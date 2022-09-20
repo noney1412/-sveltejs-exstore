@@ -21,18 +21,33 @@ const count = ex<Count>({
 		this.$init += 1;
 	},
 	increaseBy(by) {
-		this.$init + by;
+		this.$init += by;
 	},
 	decrease() {
-		this.$init - 1;
+		this.$init -= 1;
 	},
 	reset() {
 		this.$init = 0;
 	}
 });
 
+interface Profile {
+	name: string;
+	age: number;
+	setName: (name: string) => void;
+}
+
+const profile = ex<Profile>({
+	$name: 'profile-store',
+	name: 'John',
+	age: 30,
+	setName(name) {
+		this.name = name;
+	}
+});
+
 test('count should be a writable store', () => {
-	expectType<Writable<unknown>>(count);
+	expectType<Writable<number>>(count);
 });
 
 describe(`stage 1: (count) function: Subscribe, Update and Set`, () => {
@@ -40,8 +55,50 @@ describe(`stage 1: (count) function: Subscribe, Update and Set`, () => {
 
 	beforeAll(() => {
 		unsubscribe = count.subscribe((value) => {
-			expectType<number>(value as number);
-			console.log('count: ', value);
+			expectType<number>(value);
+			console.log('stage 1: count = ', value);
+		});
+	});
+
+	beforeEach(() => {
+		count.set(0);
+		expect(get(count)).toBe(0);
+	});
+
+	afterAll(() => {
+		unsubscribe();
+		count.set(0);
+		expect(get(count)).toBe(0);
+	});
+
+	it('increase by update', () => {
+		count.update((c) => c + 1);
+		expect(get(count)).toBe(1);
+		count.update((c) => c + 50);
+		expect(get(count)).toBe(51);
+	});
+
+	it('decrease by update', () => {
+		count.update((c) => c - 1);
+		expect(get(count)).toBe(-1);
+	});
+
+	it('reset by update', () => {
+		count.update((c) => c + 1);
+		expect(get(count)).toBe(1);
+
+		count.update(() => 0);
+		expect(get(count)).toBe(0);
+	});
+});
+
+describe('stage 2: (count) function: Actions', () => {
+	let unsubscribe: () => void;
+
+	beforeAll(() => {
+		unsubscribe = count.subscribe((value) => {
+			expectType<number>(value);
+			console.log('stage 2: count = ', value);
 		});
 	});
 
@@ -57,43 +114,19 @@ describe(`stage 1: (count) function: Subscribe, Update and Set`, () => {
 	});
 
 	it('increase', () => {
-		count.update((c) => c + 1);
-		expect(get(count)).toBe(1);
-	});
-
-	it('increaseBy', () => {
-		count.update((c) => c + 2);
+		count.increase();
+		count.increase();
 		expect(get(count)).toBe(2);
 	});
 
-	it('decrease', () => {
-		count.update((c) => c - 1);
-		expect(get(count)).toBe(-1);
-	});
-
-	it('reset', () => {
-		count.update((c) => c + 1);
-		expect(get(count)).toBe(1);
-
-		count.update(() => 0);
-		expect(get(count)).toBe(0);
+	it('increaseBy', () => {
+		count.increaseBy(2);
+		count.increaseBy(2);
+		expect(get(count)).toBe(4);
 	});
 });
 
-describe('stage 2: (count) function: actions', () => {
-	beforeAll(() => {
-		count.set(0);
-		expect(get(count)).toBe(0);
-	});
-
-	it('increase', () => {
-		count.increase();
-		count.increase();
-		console.log(count);
-	});
-});
-
-describe('bound action to update state', () => {
+describe('bind action to update function from store', () => {
 	it('wrap action to update primitive to writable store', () => {
 		const count: ExSlice<Count> = {
 			$name: 'count-store',
@@ -135,7 +168,7 @@ describe('bound action to update state', () => {
 		boundActions.increase();
 		boundActions.increaseBy(200);
 
-		expect(state.bind).toBe(203);
+		expect(state.bind.$init).toBe(203);
 		expect(get(store)).toBe(203);
 	});
 
@@ -183,6 +216,70 @@ describe('bound action to update state', () => {
 		expect(get(store)).toEqual({
 			name: 'Jane',
 			age: 20
+		});
+	});
+});
+
+describe('stage 3: primitive(count): use actions to update state', () => {
+	let unsubscribe: () => void;
+	beforeAll(() => {
+		unsubscribe = count.subscribe((value) => {
+			expectType<number>(value);
+			console.log('stage 3: count = ', value);
+		});
+
+		count.set(0);
+		expect(get(count)).toBe(0);
+	});
+
+	afterEach(() => {
+		count.reset();
+		expect(get(count)).toBe(0);
+	});
+
+	afterAll(() => {
+		unsubscribe();
+		count.set(0);
+		expect(get(count)).toBe(0);
+	});
+	it('increase', () => {
+		count.increase();
+		expect(get(count)).toBe(1);
+		count.increase();
+		expect(get(count)).toBe(2);
+	});
+
+	it('increaseBy', () => {
+		count.increaseBy(2);
+		expect(get(count)).toBe(2);
+		count.increaseBy(2);
+		expect(get(count)).toBe(4);
+	});
+});
+
+describe('stage 4: reference(profile): use actions to update state', () => {
+	let unsubscribe: () => void;
+
+	beforeAll(() => {
+		unsubscribe = profile.subscribe((value) => {
+			console.log('stage 4: profile = ', value);
+		});
+	});
+
+	afterEach(() => {
+		profile.set({} as Profile);
+		expect(get(profile)).toEqual({});
+	});
+
+	afterAll(() => {
+		unsubscribe();
+	});
+
+	it('set name', () => {
+		profile.setName('Jane');
+		expect(get(profile)).toEqual({
+			name: 'Jane',
+			age: 30
 		});
 	});
 });

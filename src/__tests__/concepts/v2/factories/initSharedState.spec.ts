@@ -1,5 +1,10 @@
 import type { OnlyState } from '../types/Utils';
-import { analyzeMode, bindActions, getOnlyStateFormSlice, getCurrentState } from './initSharedState';
+import {
+	analyzeMode,
+	bindActions,
+	getOnlyStateFormSlice,
+	getCurrentState
+} from './initSharedState';
 
 describe(`The state to be bound to an action is called "bind."`, () => {
 	it('case 1: only $init', () => {
@@ -331,9 +336,9 @@ describe('bind actions', () => {
 
 	it('should bind object with all actions', () => {
 		const bind: OnlyState<Count> = getOnlyStateFormSlice(countSlice);
-		
+
 		const actions = bindActions(bind, countSlice);
-		
+
 		actions.increase();
 
 		expect(bind.$init).toBe(1);
