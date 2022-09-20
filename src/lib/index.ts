@@ -35,7 +35,7 @@ function ex<State>(slice: ExSlice<State>) {
 	const wrappedSet = setState;
 
 	const wrappedUpdate = (fn: (value: InitialState) => InitialState) => {
-		const value = fn(getCurrentState(state)) as WritableState<typeof state.initialState>;
+		const value = fn(getCurrentState(state));
 		wrappedSet(value);
 	};
 
@@ -86,7 +86,7 @@ function ex<State>(slice: ExSlice<State>) {
 
 	function applyMiddleware() {
 		middleware.subscribe((m) => {
-			withReduxDevtool<WritableState<InitialState>>(m);
+			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
 		});
 	}
 }
