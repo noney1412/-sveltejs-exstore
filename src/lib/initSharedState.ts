@@ -18,7 +18,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 	state.name = slice.$name || 'anonymous_';
 	state.bind = getOnlyStateFormSlice(slice);
 	state.mode = analyzeMode(slice);
-	state.initialState = getCurrentState(state);
+	state.initialState = getInitialState(state);
 
 	return state;
 }
@@ -54,6 +54,19 @@ export function getCurrentState<State>(
 	}
 
 	return state.mode === 'primitive' ? init : state.bind;
+}
+
+export function getInitialState<State>(
+	state: SharedState<State>
+): SharedState<State>['initialState'] {
+	const bind = state.bind as any;
+	let init: any;
+
+	if (bind.$init !== undefined) {
+		init = bind.$init;
+	}
+
+	return state.mode === 'primitive' ? init : { ...state.bind };
 }
 
 export function bindActions<State>(bind: SharedState<State>['bind'], slice: ExSlice<State>) {

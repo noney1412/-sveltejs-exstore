@@ -1,8 +1,10 @@
-import { Writable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import { initSharedState, bindActions, getCurrentState } from './initSharedState';
+import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
-import type { OnlyState, OnlyFunc, Nullable } from './types/Utils';
+import type { OnlyFunc, Nullable } from './types/Utils';
 
 type WritableState<T> = T | Record<string, T>;
 
@@ -33,7 +35,7 @@ function ex<State>(slice: ExSlice<State>) {
 	const wrappedSet = setState;
 
 	const wrappedUpdate = (fn: (value: InitialState) => InitialState) => {
-		const value = fn(getCurrentState(state)) as WritableState<typeof state.initialState>;
+		const value = fn(getCurrentState(state));
 		wrappedSet(value);
 	};
 
@@ -49,11 +51,8 @@ function ex<State>(slice: ExSlice<State>) {
 			}
 
 			function updateState() {
-				store.update((prev) => {
-					fn.apply(prev, args);
-					const newState = getCurrentState(state);
-					return newState;
-				});
+				fn(...args);
+				store.set(getCurrentState(state));
 			}
 
 			function afterUpdateSate() {
@@ -62,6 +61,8 @@ function ex<State>(slice: ExSlice<State>) {
 		};
 		return acc;
 	}, {}) as OnlyFunc<State>;
+
+	applyMiddleware();
 
 	return {
 		subscribe: store.subscribe,
@@ -78,10 +79,15 @@ function ex<State>(slice: ExSlice<State>) {
 	function setState(value: WritableState<InitialState>) {
 		if (state.mode === 'primitive') {
 			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
-		} else {
-			state.bind = value as OnlyState<State>;
 		}
+
 		store.set(value);
+	}
+
+	function applyMiddleware() {
+		middleware.subscribe((m) => {
+			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
+		});
 	}
 }
 
