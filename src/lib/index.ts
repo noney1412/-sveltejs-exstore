@@ -52,8 +52,9 @@ function ex<State>(slice: ExSlice<State>) {
 
 			function updateState() {
 				store.update((prev) => {
-					fn.apply(prev, args);
+					fn.apply(state.bind, args);
 					const newState = getCurrentState(state);
+					debugger;
 					return newState;
 				});
 			}
@@ -82,9 +83,9 @@ function ex<State>(slice: ExSlice<State>) {
 	function setState(value: WritableState<InitialState>) {
 		if (state.mode === 'primitive') {
 			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
-		} else {
-			state.bind = value as OnlyState<State>;
 		}
+
+		debugger;
 		store.set(value);
 	}
 
