@@ -4,7 +4,7 @@ import { initSharedState, bindActions, getCurrentState } from './initSharedState
 import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
-import type { OnlyState, OnlyFunc, Nullable } from './types/Utils';
+import type { OnlyFunc, Nullable } from './types/Utils';
 
 type WritableState<T> = T | Record<string, T>;
 
