@@ -1,6 +1,5 @@
-import type { ExSlice, Extensions } from '../types/ExSlice';
-import type { OnlyFunc, OnlyState } from '../types/Utils';
-import uuid from 'uuid-random';
+import type { ExSlice, Extensions } from './types/ExSlice';
+import type { OnlyFunc, OnlyState } from './types/Utils';
 interface SharedState<T> {
 	name: string;
 	bind: OnlyState<T>;
@@ -16,7 +15,7 @@ export function initSharedState<State>(slice: ExSlice<State>) {
 		initialState: ({} as any).$init ?? undefined
 	};
 
-	state.name = slice.$name || 'anonymous_' + uuid();
+	state.name = slice.$name || 'anonymous_';
 	state.bind = getOnlyStateFormSlice(slice);
 	state.mode = analyzeMode(slice);
 	state.initialState = getCurrentState(state);

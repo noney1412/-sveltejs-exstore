@@ -1,10 +1,10 @@
-import type { OnlyState } from '../types/Utils';
+import type { OnlyState } from '../lib/types/Utils';
 import {
 	analyzeMode,
 	bindActions,
 	getOnlyStateFormSlice,
 	getCurrentState
-} from './initSharedState';
+} from '../lib/initSharedState';
 
 describe(`The state to be bound to an action is called "bind."`, () => {
 	it('case 1: only $init', () => {

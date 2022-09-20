@@ -1,10 +1,10 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { expectType } from 'vite-plugin-vitest-typescript-assert/tsd';
-import { ex } from './ex';
-import { bindActions, getCurrentState, initSharedState } from './factories/initSharedState';
-import type { ExSlice } from './types/ExSlice';
-import type { OnlyFunc } from './types/Utils';
+import { bindActions, getCurrentState, initSharedState } from '../lib/initSharedState';
+import type { ExSlice } from '../lib/types/ExSlice';
+import type { OnlyFunc } from '../lib/types/Utils';
+import ex from '$lib';
 
 interface Count {
 	$init: number;
