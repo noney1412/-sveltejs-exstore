@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { initSharedState, bindActions, getCurrentState } from './initSharedState';
+import { initSharedState, getActions } from './initSharedState';
 import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
@@ -11,7 +11,7 @@ type WritableState<T> = T | Record<string, T>;
 function ex<State>(slice: ExSlice<State>) {
 	const state = initSharedState(slice);
 
-	const actions = bindActions(state.bind, slice);
+	const actions = getActions(slice);
 
 	type InitialState = typeof state.initialState;
 
@@ -25,7 +25,7 @@ function ex<State>(slice: ExSlice<State>) {
 		currentActionName: '',
 		store: {
 			subscribe: store.subscribe,
-			set: setState,
+			set: store.set,
 			update: store.update
 		},
 		trace: '',
@@ -36,18 +36,19 @@ function ex<State>(slice: ExSlice<State>) {
 		const m = get(middleware);
 		m.currentActionName = 'set';
 		m.previousState = get(store) as Nullable<InitialState>;
-		setState(value);
+		store.set(value);
 		m.currentState = get(store) as Nullable<InitialState>;
 		m.trace = getOnlySvelteTrace();
 		middleware.set(m);
 	};
 
-	const wrappedUpdate = (fn: (value: InitialState) => InitialState) => {
+	const wrappedUpdate = (
+		fn: (value: WritableState<InitialState>) => WritableState<InitialState>
+	) => {
 		const m = get(middleware);
 		m.currentActionName = 'update';
 		m.previousState = get(store) as Nullable<InitialState>;
-		const value = fn(getCurrentState(state));
-		wrappedSet(value);
+		store.update(fn);
 		m.currentState = get(store) as Nullable<InitialState>;
 		m.trace = getOnlySvelteTrace();
 		middleware.set(m);
@@ -104,13 +105,6 @@ function ex<State>(slice: ExSlice<State>) {
 		};
 
 	/* --- Inner functions --- */
-	function setState(value: WritableState<InitialState>) {
-		if (state.mode === 'primitive') {
-			(state as typeof state & { bind: { $init: unknown } }).bind.$init = value;
-		}
-
-		store.set(value);
-	}
 
 	function applyMiddleware() {
 		middleware.subscribe((m) => {
