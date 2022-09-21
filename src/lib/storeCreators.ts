@@ -1,28 +1,14 @@
 import type { ExSlice, Extensions } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
-interface SharedState<T> {
-	reference: OnlyState<T>;
-	mode: 'primitive' | 'reference';
-	initialState: OnlyState<T> extends { $init: infer U } ? U : OnlyState<T>;
+
+type Mode = 'primitive' | 'reference';
+
+export function analyzeMode<State>(state: OnlyState<State>): Mode {
+	if ((state as any).$init === undefined) return 'reference';
+	return (state as any).$init instanceof Object ? 'reference' : 'primitive';
 }
 
-export function initSharedState<State>(slice: ExSlice<State>) {
-	const state: SharedState<State> = {
-		reference: {} as OnlyState<State>,
-		mode: 'primitive',
-		initialState: ({} as any).$init ?? undefined
-	};
-
-	state.reference = getOnlyStateFormSlice(slice);
-	state.mode = analyzeMode(slice);
-	state.initialState = getInitialState(state);
-
-	return state;
-}
-
-export function getOnlyStateFormSlice<State>(
-	slice: ExSlice<State>
-): SharedState<State>['reference'] {
+export function getOnlyStateFormSlice<State>(slice: ExSlice<State>): OnlyState<State> {
 	const options: Array<keyof Extensions> = ['$name', '$options'];
 
 	const isNotFunctionAndNotOptions = (key: string, value: unknown) =>
@@ -32,27 +18,16 @@ export function getOnlyStateFormSlice<State>(
 		isNotFunctionAndNotOptions(key, value)
 	);
 
-	const state = Object.fromEntries(filtered) as SharedState<State>['reference'];
+	const state = Object.fromEntries(filtered) as OnlyState<State>;
 
 	return state;
 }
 
-export function analyzeMode<State>(slice: ExSlice<State>): SharedState<State>['mode'] {
-	if ((slice as any).$init === undefined) return 'reference';
-	return (slice as any).$init instanceof Object ? 'reference' : 'primitive';
-}
-
 export function getInitialState<State>(
-	state: SharedState<State>
-): SharedState<State>['initialState'] {
-	const bind = state.reference as any;
-	let init: any;
-
-	if (bind.$init !== undefined) {
-		init = bind.$init;
-	}
-
-	return state.mode === 'primitive' ? init : { ...state.reference };
+	state: OnlyState<State>,
+	mode: Mode
+): OnlyState<State> extends { $init: infer U } ? U : OnlyState<State> {
+	return mode === 'primitive' ? (state as any).$init : { ...state };
 }
 
 export function getActions<State>(slice: ExSlice<State>) {

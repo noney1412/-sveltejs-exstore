@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { initSharedState, getActions } from './storeCreators';
+import { getActions as getActionsFromSlice, analyzeMode, getInitialState, getOnlyStateFormSlice } from './storeCreators';
 import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
@@ -9,17 +9,18 @@ import type { OnlyFunc, Nullable } from './types/Utils';
 type WritableState<T> = T | Record<string, T>;
 
 function ex<State>(slice: ExSlice<State>) {
-	const state = initSharedState(slice);
+	const state = getOnlyStateFormSlice(slice);
+	const mode = analyzeMode(state);
+	const initialState = getInitialState(state, mode);
+	const actions = getActionsFromSlice(slice);
 
-	const actions = getActions(slice);
+	type InitialState = typeof initialState;
 
-	type InitialState = typeof state.initialState;
-
-	const store = writable<WritableState<InitialState>>(state.initialState);
+	const store = writable<WritableState<InitialState>>(initialState);
 
 	const middleware = writable<ExMiddleware<WritableState<InitialState>>>({
 		storeName: slice.$name ?? '',
-		initialState: state.initialState,
+		initialState: initialState,
 		previousState: undefined as Nullable<InitialState>,
 		currentState: undefined as Nullable<InitialState>,
 		currentActionName: '',
@@ -69,7 +70,7 @@ function ex<State>(slice: ExSlice<State>) {
 
 			function updateState() {
 				store.update((prev) => {
-					if (state.mode === 'primitive') {
+					if (mode === 'primitive') {
 						const bindState = {
 							$init: prev
 						};
