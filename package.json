@@ -1,6 +1,22 @@
 {
 	"name": "svelte-exstore",
-	"version": "0.0.1",
+	"version": "2.0.0",
+	"description": "A simple state management library for Svelte, able to connect with Redux DevTools",
+	"keywords": [
+		"svelte",
+		"redux",
+		"store"
+	],
+	"license": "MIT",
+	"author": "Chanon Panpila",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/noney1412/svelte-exstore.git"
+	},
+	"bugs": {
+		"url": "https://github.com/noney1412/svelte-exstore/issues"
+	},
+	"homepage": "https://github.com/noney1412/svelte-exstore",
 	"scripts": {
 		"dev": "vite dev --host --mode development",
 		"build": "vite build",
