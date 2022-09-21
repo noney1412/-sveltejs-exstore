@@ -1,9 +1,3 @@
-# Documentation
-
-Date Created: September 21, 2022 11:24 PM
-Last edited by: cn p
-Last edited time: September 22, 2022 12:09 AM
-
 # Svelte ExStore
 
 This package is basically a writable store wrapper.
