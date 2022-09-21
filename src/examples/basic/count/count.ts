@@ -2,10 +2,10 @@ import ex from '$lib';
 
 export interface Count {
 	$init: number;
-	increase: () => void;
-	decrease: () => void;
-	increaseBy: (by: number) => void;
-	reset: () => void;
+	increase(): void;
+	decrease(): void;
+	increaseBy(by: number): void;
+	reset(): void;
 }
 export const count = ex<Count>({
 	$name: 'count',
