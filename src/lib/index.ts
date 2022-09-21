@@ -105,8 +105,8 @@ function ex<State>(slice: ExSlice<State>) {
 		};
 
 	/* --- Inner functions --- */
-
 	function applyMiddleware() {
+		// REMARK: Infer to user devtool by providing $name.
 		middleware.subscribe((m) => {
 			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
 		});

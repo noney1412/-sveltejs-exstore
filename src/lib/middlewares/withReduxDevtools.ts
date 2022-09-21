@@ -1,7 +1,6 @@
 import type { ExMiddleware } from '$lib/types/ExMiddleware';
 import { get, writable } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
-import union from 'lodash/union';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -257,9 +256,9 @@ function withReduxDevtool<State>(middleware: ExMiddleware<State>) {
 							try {
 								const liftedState = JSON.parse(message.state);
 
-								shared.liftedState.skippedActionIds = union(shared.liftedState.skippedActionIds, [
-									message.payload.id
-								]) as number[];
+								shared.liftedState.skippedActionIds = Array.from(
+									new Set([...shared.liftedState.skippedActionIds, message.payload.id])
+								);
 
 								const next: LIFTED_STATE = {
 									...shared.liftedState,
