@@ -60,9 +60,9 @@ export const count = ex<Count>({
 
 ### 3. Finally, manage your state with the redux devtools
 
-![Screenshot_2.png](docs/screenshots/Screenshot_2.png/Screenshot_2.png)
+![Screenshot_2.png](./docs/screenshots/Screenshot_2.png/Screenshot_2.png)
 
-![Screenshot_3.png](docs/screenshots/Screenshot_3.png/Screenshot_3.png)
+![Screenshot_3.png](./docs/screenshots/Screenshot_3.png/Screenshot_3.png)
 
 ## More examples
 
@@ -117,4 +117,4 @@ export const profile = ex<Profile>({
 
 ### 3. Finally, both of them are displayed.
 
-![Screenshot_5.png](docs/screenshots/Screenshot_5.png)
+![Screenshot_5.png](./docs/screenshots/Screenshot_5.png)
