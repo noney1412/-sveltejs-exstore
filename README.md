@@ -61,11 +61,11 @@ export const count = ex<Count>({
 ### 3. Finally, manage your state with the redux devtools
 
 <p align="center">
-  <img src="/docs/screenshots/Screenshot_2.png" width="350" title="hover text">
+  <img src="/docs/screenshots/Screenshot_2.png"  title="hover text">
 </p>
 
 <p align="center">
-  <img src="/docs/screenshots/Screenshot_3.png" width="350" title="hover text">
+  <img src="/docs/screenshots/Screenshot_3.png"  title="hover text">
 </p>
 
 ## More examples
@@ -122,5 +122,5 @@ export const profile = ex<Profile>({
 ### 3. Finally, both of them are displayed.
 
 <p align="center">
-  <img src="/docs/screenshots/Screenshot_5.png" width="350" title="hover text">
+  <img src="/docs/screenshots/Screenshot_5.png"  title="hover text">
 </p>
