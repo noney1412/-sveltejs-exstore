@@ -1,7 +1,7 @@
 import type { ExSlice, Extensions } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
 
-type Mode = 'bind-$init' | 'as-reference';
+export type Mode = 'bind-$init' | 'as-reference';
 
 export function analyzeMode<State>(state: OnlyState<State>): Mode {
 	if ((state as any).$init === undefined && !Object.hasOwn(state, '$init')) return 'as-reference';
