@@ -165,8 +165,6 @@ function withReduxDevtool<State>(middleware: ExMiddleware<State>) {
 		if (!shared.devTool) return;
 
 		shared.devTool.subscribe((message: any) => {
-			console.log(message);
-
 			switch (message.type) {
 				case 'DISPATCH': {
 					switch (message.payload.type) {
