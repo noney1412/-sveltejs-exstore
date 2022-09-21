@@ -5,6 +5,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import WindiCSS from 'vite-plugin-windicss';
 import type { UserConfigExport } from 'vite';
 import { resolve } from 'path';
+import { vitestTypescriptAssertPlugin } from 'vite-plugin-vitest-typescript-assert';
 
 const config: UserConfigExport = {
 	test: {
@@ -13,7 +14,7 @@ const config: UserConfigExport = {
 		setupFiles: 'src/setupTests.ts',
 		silent: false
 	},
-	plugins: [sveltekit(), WindiCSS()],
+	plugins: [sveltekit(), WindiCSS(), vitestTypescriptAssertPlugin()],
 	resolve: {
 		alias: {
 			$routes: resolve('./src/routes'),
