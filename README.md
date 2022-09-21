@@ -117,4 +117,6 @@ export const profile = ex<Profile>({
 
 ### 3. Finally, both of them are displayed.
 
-![Screenshot_5.png](/docs/screenshots/Screenshot_5.png)
+<p align="center">
+  <img src="/docs/screenshots/Screenshot_5.png" width="350" title="hover text">
+</p>
