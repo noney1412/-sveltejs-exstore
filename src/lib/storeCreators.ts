@@ -4,7 +4,7 @@ import type { OnlyFunc, OnlyState } from './types/Utils';
 type Mode = 'primitive' | 'reference';
 
 export function analyzeMode<State>(state: OnlyState<State>): Mode {
-	if ((state as any).$init === undefined) return 'reference';
+	if ((state as any).$init === undefined && !Object.hasOwn(state, '$init')) return 'reference';
 	return (state as any).$init instanceof Object ? 'reference' : 'primitive';
 }
 
