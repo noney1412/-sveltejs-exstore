@@ -1,11 +1,11 @@
 import type { ExSlice, Extensions } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
 
-type Mode = 'primitive' | 'reference';
+type Mode = 'bind-$init' | 'as-reference';
 
 export function analyzeMode<State>(state: OnlyState<State>): Mode {
-	if ((state as any).$init === undefined && !Object.hasOwn(state, '$init')) return 'reference';
-	return (state as any).$init instanceof Object ? 'reference' : 'primitive';
+	if ((state as any).$init === undefined && !Object.hasOwn(state, '$init')) return 'as-reference';
+	return (state as any).$init instanceof Object ? 'as-reference' : 'bind-$init';
 }
 
 export function getOnlyStateFormSlice<State>(slice: ExSlice<State>): OnlyState<State> {
@@ -27,7 +27,7 @@ export function getInitialState<State>(
 	state: OnlyState<State>,
 	mode: Mode
 ): OnlyState<State> extends { $init: infer U } ? U : OnlyState<State> {
-	return mode === 'primitive' ? (state as any).$init : { ...state };
+	return mode === 'bind-$init' ? (state as any).$init : { ...state };
 }
 
 export function getActionsFromSlice<State>(slice: ExSlice<State>) {

@@ -75,7 +75,7 @@ function ex<State>(slice: ExSlice<State>) {
 
 			function updateState() {
 				store.update((prev) => {
-					if (mode === 'primitive') {
+					if (mode === 'bind-$init') {
 						const bindState = {
 							$init: prev
 						};
