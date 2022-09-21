@@ -18,7 +18,7 @@ function ex<State>(slice: ExSlice<State>) {
 	const store = writable<WritableState<InitialState>>(state.initialState);
 
 	const middleware = writable<ExMiddleware<WritableState<InitialState>>>({
-		storeName: state.name,
+		storeName: slice.$name ?? '',
 		initialState: state.initialState,
 		previousState: undefined as Nullable<InitialState>,
 		currentState: undefined as Nullable<InitialState>,
