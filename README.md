@@ -1,40 +1,120 @@
-[![Node.js CI](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml/badge.svg)](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml)
+# Documentation
 
-# create-svelte
+Date Created: September 21, 2022 11:24 PM
+Last edited by: cn p
+Last edited time: September 22, 2022 12:09 AM
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+# Svelte ExStore
 
-## Creating a project
+This package is basically a writable store wrapper.
 
-If you're seeing this, you've probably already done this step. Congrats!
+connect Redux Devtools to enhance your work flow.
 
-```bash
-# create a new project in the current directory
-npm init svelte
+## Usage
 
-# create a new project in my-app
-npm init svelte my-app
+```tsx
+npm install svelte-exstore
 ```
 
-## Developing
+### 1. Create a store
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+```tsx
+export interface Count {
+	$init: number;
+	increase(): void;
+	decrease(): void;
+	increaseBy(by: number): void;
+	reset(): void;
+}
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+export const count = ex<Count>({
+	$name: 'count', // `$name` will be displayed in the devtools as a store name.
+	$init: 0, 
+	increase: function () {
+		this.$init += 1; // retrieve your current state with `this` keyword.
+	},
+	increaseBy: function (by) {
+		this.$init += by;
+	},
+	decrease: function () {
+		this.$init -= 1;
+	},
+	reset: function () {
+		this.$init = 0;
+	}
+});
 ```
 
-## Building
+### 2. Then bind your svelte component
 
-To create a production version of your app:
+```tsx
+<script lang="ts">
+	import { count } from './count';
+</script>
 
-```bash
-npm run build
+<h1>{$count}</h1>
+<button on:click={count.increase}>+</button>
+<button on:click={() => count.increaseBy(5)}>+</button>
+<button on:click={count.reset}>reset</button>
 ```
 
-You can preview the production build with `npm run preview`.
+### 3. Finally, manage your state with the redux devtools
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+![Screenshot_2.png](docs/screenshots/Screenshot_2.png/Screenshot_2.png)
+
+![Screenshot_3.png](docs/screenshots/Screenshot_3.png/Screenshot_3.png)
+
+## More examples
+
+### Multiple Store Supports
+
+### 1. Add one more store
+
+```tsx
+export interface Profile {
+	name?: string;
+	age?: number;
+	changeName: (name: string) => void;
+}
+
+export const profile = ex<Profile>({
+	$name: 'profile',
+	name: undefined,
+	age: undefined,
+	changeName(name: string) {
+		this.name = name;
+	}
+});
+```
+
+### 2. Then bind your svelte component
+
+```tsx
+<script lang="ts">
+	import { count } from './count';
+	import { profile } from './profile';
+</script>
+
+<h1>{$profile.name ?? ''}</h1>
+<h2>{$profile.age ?? ''}</h2>
+
+<!-- bind input value to the profile store -->
+<input type="text" placeholder="name" bind:value={$profile.name} />
+<input type="text" placeholder="age" bind:value={$profile.age} />
+
+<!-- change your state by an action -->
+<button on:click={() => { profile.changeName('John Doe');}}>
+		Change Name To John Doe
+</button>
+
+<!-- set your current state by store.set() from writable store -->
+<button on:click={() => { profile.set({});}}>
+		Reset Name
+</button>
+```
+
+- you can also use `profile.subscribe()` `profile.update()` too.
+
+### 3. Finally, both of them are displayed.
+
+![Screenshot_5.png](docs/screenshots/Screenshot_5.png)
