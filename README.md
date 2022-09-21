@@ -9,6 +9,12 @@ connect Redux Devtools to enhance your work flow.
 ```tsx
 npm install svelte-exstore
 ```
+```tsx
+yarn add svelte-exstore
+```
+```tsx
+pnpm add svelte-exstore
+```
 
 ### 1. Create a store
 
