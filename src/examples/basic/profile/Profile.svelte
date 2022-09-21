@@ -13,6 +13,7 @@
 		bg="red-400"
 		border="rounded-xl"
 	>
+		<!-- bind input value to store -->
 		<h1 data-testid="display-name">{$profile.name ?? ''}</h1>
 		<h2 data-testid="display-age">{$profile.age ?? ''}</h2>
 	</div>
