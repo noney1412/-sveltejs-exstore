@@ -1,165 +1,130 @@
 import { get, writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
+import {
+	getActionsFromSlice,
+	analyzeMode,
+	getInitialState,
+	getOnlyStateFormSlice
+} from './storeCreators';
 import withReduxDevtool from './middlewares/withReduxDevtools';
-import type { Middleware } from './types/ExMiddleware';
-import type { ExSlice, ExState, InitialValue } from './types/ExSlice';
-import type { Nullable, OnlyFunc } from './types/utils';
+import type { ExMiddleware } from './types/ExMiddleware';
+import type { ExSlice } from './types/ExSlice';
+import type { OnlyFunc, Nullable } from './types/Utils';
 
-function exStore<State>(slice: ExSlice<State>) {
-	const store = writable<InitialValue<State>>(slice.initialValue as InitialValue<State>);
+type WritableState<T> = T | Record<string, T>;
 
-	let state: ExState<State> = {} as ExState<State>;
-	type WrappedAction = OnlyFunc<State> & {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		[key: string]: any;
-	};
+function ex<State>(slice: ExSlice<State>) {
+	const state = getOnlyStateFormSlice(slice);
+	const mode = analyzeMode(state);
+	const initialState = getInitialState(state, mode);
+	const actions = getActionsFromSlice(slice);
 
-	const actions = slice.actions?.(defineState()) as WrappedAction;
+	type InitialState = typeof initialState;
 
-	const middleware = writable<Middleware<InitialValue<State>>>({
-		storeName: slice.name,
-		initialState: slice.initialValue as InitialValue<State>,
-		previousState: undefined as Nullable<InitialValue<State>>,
-		currentState: undefined as Nullable<InitialValue<State>>,
+	const store = writable<WritableState<InitialState>>(initialState);
+
+	const middleware = writable<ExMiddleware<WritableState<InitialState>>>({
+		storeName: slice.$name ?? '',
+		initialState: initialState,
+		previousState: undefined as Nullable<InitialState>,
+		currentState: undefined as Nullable<InitialState>,
 		currentActionName: '',
 		store: {
 			subscribe: store.subscribe,
-			set: (x: InitialValue<State> | Record<string, never>) => {
-				setState<State>(x, store, state);
-			},
+			set: store.set,
 			update: store.update
 		},
 		trace: '',
 		defaultTrace: new Error().stack
 	});
 
-	const wrapMiddlewareStore = {
-		set: (x: InitialValue<State> | Record<string, never>) => {
-			const m = get(middleware);
-			m.currentActionName = 'set';
-			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			setState<State>(x, store, state);
-			m.trace = getTrace();
-			m.currentState = get(store) as Nullable<InitialValue<State>>;
-			middleware.set(m);
-		},
-		update: (fn: (x: InitialValue<State>) => InitialValue<State>) => {
-			const m = get(middleware);
-			m.currentActionName = 'update';
-			m.previousState = get(store) as Nullable<InitialValue<State>>;
-			store.update(fn);
-			m.trace = getTrace();
-			m.currentState = get(store) as Nullable<InitialValue<State>>;
-			middleware.set(m);
-		}
+	const wrappedSet = (value: WritableState<InitialState>) => {
+		const m = get(middleware);
+		m.currentActionName = 'set';
+		m.previousState = get(store) as Nullable<InitialState>;
+		store.set(value);
+		m.currentState = get(store) as Nullable<InitialState>;
+		m.trace = getOnlySvelteTrace();
+		middleware.set(m);
 	};
 
-	wrapAction();
+	const wrappedUpdate = (
+		fn: (value: WritableState<InitialState>) => WritableState<InitialState>
+	) => {
+		const m = get(middleware);
+		m.currentActionName = 'update';
+		m.previousState = get(store) as Nullable<InitialState>;
+		store.update(fn);
+		m.currentState = get(store) as Nullable<InitialState>;
+		m.trace = getOnlySvelteTrace();
+		middleware.set(m);
+	};
+
+	const boundActions = Object.keys(actions).reduce((acc, key) => {
+		const fn = actions[key];
+		acc[key] = function (...args: unknown[]) {
+			const m = get(middleware);
+			beforeUpdateSate();
+			updateState();
+			afterUpdateSate();
+
+			function beforeUpdateSate() {
+				m.previousState = get(store) as Nullable<InitialState>;
+				m.currentActionName = key;
+			}
+
+			function updateState() {
+				store.update((prev) => {
+					if (mode === 'bind-$init') {
+						const bindState = {
+							$init: prev
+						};
+						fn.apply(bindState, args); // if primitive mode, cache the state in $init.
+						return bindState.$init;
+					} else {
+						fn.apply(prev, args);
+						return prev;
+					}
+				});
+			}
+
+			function afterUpdateSate() {
+				m.currentState = get(store) as Nullable<InitialState>;
+				m.trace = getOnlySvelteTrace();
+				middleware.set(m);
+			}
+		};
+		return acc;
+	}, {}) as OnlyFunc<State>;
+
 	applyMiddleware();
 
 	return {
 		subscribe: store.subscribe,
-		update: wrapMiddlewareStore.update,
-		set: wrapMiddlewareStore.set,
-		...actions
-	};
+		set: wrappedSet,
+		update: wrappedUpdate,
+		...boundActions
+	} as OnlyFunc<State> &
+		Writable<InitialState> & {
+			set: (value: WritableState<InitialState>) => void;
+			update: (fn: (value: InitialState) => InitialState) => void;
+		};
 
-	/**
-	 * Define state if the initial value is primitive or reference type
-	 * - Primitive type: number, string, boolean, null, undefined
-	 * - Reference type: object, array, function
-	 * if the initial value is a primitive type, the state will be `{ current: initialValue }`
-	 * if the initial value is a reference type, the state will be `initialValue`
-	 */
-	function defineState() {
-		if (slice.initialValue instanceof Object) {
-			state = slice.initialValue as ExState<State>;
-		} else {
-			state = {
-				current: slice.initialValue
-			} as ExState<State>;
-		}
-
-		return state;
+	/* --- Inner functions --- */
+	function applyMiddleware() {
+		// REMARK: Infer user to use devtool by providing $name.
+		middleware.subscribe((m) => {
+			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
+		});
 	}
 
-	/**
-	 * Wrap all action functions in order to custom update behavior.
-	 * (only primitive type) If the action function returns a value, the store will be updated with the returned value.
-	 * (only primitive type) state.current will be updated with the returned value.
-	 * (reference type) no value returned. state will be updated within the actions.
-	 */
-	function wrapAction() {
-		if (actions && actions instanceof Object) {
-			for (const key in actions) {
-				const fn = actions[key] as (...args: unknown[]) => void | InitialValue<State>;
-				actions[key as keyof WrappedAction] = function (...args: unknown[]) {
-					const m = get(middleware);
-
-					beforeUpdateState();
-					updateState();
-					afterUpdateState();
-
-					function beforeUpdateState() {
-						m.previousState = get(store) as Nullable<InitialValue<State>>;
-					}
-
-					function updateState() {
-						store.update((current) => {
-							if (current instanceof Object) {
-								fn(...args);
-								m.trace = getTrace();
-
-								// the current is here (reference type)
-								return state as InitialValue<State>;
-							} else {
-								state.current = fn(...args) as InitialValue<State>;
-								m.trace = getTrace();
-
-								// the current is here (primitive type)
-								return state.current;
-							}
-						});
-					}
-
-					function afterUpdateState() {
-						m.currentActionName = key;
-						m.currentState = get(store) as Nullable<InitialValue<State>>;
-						middleware.set(m);
-					}
-				};
-			}
-		}
-	}
-
-	function getTrace() {
+	function getOnlySvelteTrace() {
 		const stack = new Error().stack?.split('\n');
 		const svelte = stack?.filter((x) => x.includes('.svelte')) ?? [];
 		const store = [get(middleware).defaultTrace?.split('\n').at(-1)] ?? [];
 		const trace = [stack?.at(0), ...svelte, ...store].join('\n');
 		return trace;
 	}
-
-	/**
-	 * subscribe the middlewaretore to apply middlewares.
-	 */
-	function applyMiddleware() {
-		middleware.subscribe((m) => {
-			withReduxDevtool<InitialValue<State>>(m);
-		});
-	}
-
-	function setState<State>(
-		x: InitialValue<State> | Record<string, never>,
-		store,
-		state: ExState<State>
-	) {
-		if (x instanceof Object) {
-			store.set(x as InitialValue<State>);
-		} else {
-			state.current = x;
-			store.set(state.current);
-		}
-	}
 }
 
-export default exStore;
+export default ex;

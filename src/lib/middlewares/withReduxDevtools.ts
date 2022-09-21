@@ -1,7 +1,6 @@
-import type { Middleware } from '$lib/types/ExMiddleware';
+import type { ExMiddleware } from '$lib/types/ExMiddleware';
 import { get, writable } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
-import _ from 'lodash';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -135,7 +134,7 @@ const shared = {
 	middlewareByName: new Map()
 };
 
-function withReduxDevtool<State>(middleware: Middleware<State>) {
+function withReduxDevtool<State>(middleware: ExMiddleware<State>) {
 	update();
 	initStore();
 	subscribeStore();
@@ -151,7 +150,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 		const initialValue = {} as { [key: string]: unknown };
 
 		shared.middlewareByName.forEach((middleware) => {
-			const m: Middleware<State> = middleware;
+			const m: ExMiddleware<State> = middleware;
 			initialValue[m.storeName] = get(m.store);
 		});
 
@@ -166,8 +165,6 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 		if (!shared.devTool) return;
 
 		shared.devTool.subscribe((message: any) => {
-			console.log(message);
-
 			switch (message.type) {
 				case 'DISPATCH': {
 					switch (message.payload.type) {
@@ -205,7 +202,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 							const initialValue = {} as { [key: string]: unknown };
 
 							shared.middlewareByName.forEach((middleware) => {
-								const m: Middleware<State> = middleware;
+								const m: ExMiddleware<State> = middleware;
 								initialValue[m.storeName] = get(m.store);
 							});
 
@@ -244,7 +241,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 							if (m.payload.status === false) {
 								shared.middlewareByName.forEach((middleware) => {
-									const m: Middleware<State> = middleware;
+									const m: ExMiddleware<State> = middleware;
 									initialValue[m.storeName] = get(m.store);
 								});
 
@@ -257,9 +254,9 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 							try {
 								const liftedState = JSON.parse(message.state);
 
-								shared.liftedState.skippedActionIds = _.union(shared.liftedState.skippedActionIds, [
-									message.payload.id
-								]) as number[];
+								shared.liftedState.skippedActionIds = Array.from(
+									new Set([...shared.liftedState.skippedActionIds, message.payload.id])
+								);
 
 								const next: LIFTED_STATE = {
 									...shared.liftedState,
@@ -340,7 +337,7 @@ function withReduxDevtool<State>(middleware: Middleware<State>) {
 
 		const currentIndex = next.currentStateIndex;
 
-		const slice = _.slice(next.computedStates, 0, currentIndex + 1);
+		const slice = next.computedStates.slice(0, currentIndex + 1);
 
 		keys.forEach((key) => {
 			const value = slice.filter((item) => item.state[key]).pop()?.state[key];

@@ -1,20 +1,15 @@
+import type { Extensions } from './ExSlice';
 export type Nullable<T> = T & undefined & null;
 
-export type AnyVoidFunction = (...args: never[]) => void;
+export type OnlyFuncKeys<T> = {
+	[Props in keyof T]: T[Props] extends (...args: never[]) => unknown ? Props : never;
+}[keyof T];
 
-/**
- * Extract function from object.
- */
-export type ExtractFunctionFromObject<Props> = {
-	[Key in keyof Props]: Props[Key] extends AnyVoidFunction ? Key : Props;
-}[keyof Props];
+export type OnlyFunc<T> = Pick<T, OnlyFuncKeys<T>>;
 
-/**
- * Pick only function from object.
- */
-export type OnlyFunc<T> = Pick<T, ExtractFunctionFromObject<T>>;
+export type OnlyValue<T> = Omit<T, OnlyFuncKeys<T>>;
 
-/**
- * Pick only primitive from object.
- */
-export type OnlyPrimitive<T> = Omit<T, ExtractFunctionFromObject<T>>;
+export type OnlyState<T> = Omit<OnlyValue<T>, keyof Extensions>;
+export type ImplyThis<T> = {
+	[K in keyof T]: T[K] extends (...args: infer P) => infer R ? (this: T, ...args: P) => R : T[K];
+};

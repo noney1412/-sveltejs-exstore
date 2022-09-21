@@ -1,30 +1,7 @@
-import exStore from '$lib';
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { get } from 'svelte/store';
 import Count from './Count.svelte';
 
-test('increase the number', () => {
-	interface Count {
-		$initialValue: number;
-		increase: () => void;
-	}
-
-	const count = exStore<Count>({
-		name: 'count',
-		initialValue: 0,
-		actions: (state) => ({
-			increase: () => state.current + 1
-		})
-	});
-
-	expect(get(count)).toBe(0);
-
-	count.increase();
-
-	expect(get(count)).toBe(1);
-});
-
-test('render <Count /> and fire click & input events.', async () => {
+test('render <Count /> and count store.', async () => {
 	render(Count);
 
 	const number = screen.getByRole('heading', {

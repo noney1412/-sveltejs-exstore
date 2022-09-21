@@ -1,34 +1,7 @@
-import exStore from '$lib';
-import { get } from 'svelte/store';
 import { render, fireEvent, screen } from '@testing-library/svelte';
 import Profile from './Profile.svelte';
 
-test('change profile name.', () => {
-	interface Profile {
-		name: string;
-		age: number;
-		changeName: (name: string) => void;
-	}
-
-	const profile = exStore<Profile>({
-		name: 'profile-test-store',
-		initialValue: { name: 'John Doe', age: 60 },
-		actions: (state) => ({
-			changeName(name: string) {
-				state.name = name;
-			}
-		})
-	});
-
-	profile.changeName('Sam Wilson');
-
-	expect(get(profile).name).toBe('Sam Wilson');
-	expect(get(profile).age).toBe(60);
-
-	console.log(get(profile));
-});
-
-test('render <Profile /> and bind input with store.', async () => {
+test('render <Profile /> and profile store', async () => {
 	render(Profile);
 	const displayName = screen.getByTestId('display-name');
 	const displayAge = screen.getByTestId('display-age');
@@ -44,4 +17,10 @@ test('render <Profile /> and bind input with store.', async () => {
 
 	expect(displayName).toHaveTextContent('Sam Wilson');
 	expect(displayAge).toHaveTextContent('99');
+
+	await fireEvent.input(inputName, { target: { value: 'Joe Brown' } });
+	await fireEvent.input(inputAge, { target: { value: 35 } });
+
+	expect(displayName).toHaveTextContent('Joe Brown');
+	expect(displayAge).toHaveTextContent('35');
 });

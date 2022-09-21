@@ -1,5 +1,5 @@
-import type { ExSlice, Extensions } from './types/ExSlice';
-import type { OnlyFunc, OnlyState } from './types/Utils';
+import type { ExSlice, Extensions } from '../lib/types/ExSlice';
+import type { OnlyFunc, OnlyState } from '../lib/types/Utils';
 
 interface Profile {
 	name: string;
