@@ -67,8 +67,18 @@ function ex<State>(slice: ExSlice<State>) {
 			}
 
 			function updateState() {
-				fn(...args);
-				store.set(getCurrentState(state));
+				store.update((prev) => {
+					if (state.mode === 'primitive') {
+						const bindState = {
+							$init: prev
+						};
+						fn.apply(bindState, args); // if primitive mode, cache the state in $init.
+						return bindState.$init;
+					} else {
+						fn.apply(prev, args);
+						return prev;
+					}
+				});
 			}
 
 			function afterUpdateSate() {
