@@ -23,7 +23,7 @@ export interface Count {
 
 export const count = ex<Count>({
 	$name: 'count', // `$name` will be displayed in the devtools as a store name.
-	$init: 0, 
+	$init: 0,
 	increase: function () {
 		this.$init += 1; // retrieve your current state with `this` keyword.
 	},
@@ -39,7 +39,7 @@ export const count = ex<Count>({
 });
 ```
 
-### 2. Then bind your svelte component
+### 2. Then bind it to your svelte component
 
 ```tsx
 <script lang="ts">
@@ -47,6 +47,8 @@ export const count = ex<Count>({
 </script>
 
 <h1>{$count}</h1>
+<!--  $count is an alias for $count.$init  -->
+
 <button on:click={count.increase}>+</button>
 <button on:click={() => count.increaseBy(5)}>+</button>
 <button on:click={count.reset}>reset</button>
@@ -85,7 +87,7 @@ export const profile = ex<Profile>({
 });
 ```
 
-### 2. Then bind your svelte component
+### 2. Then bind it to your svelte component
 
 ```tsx
 <script lang="ts">
