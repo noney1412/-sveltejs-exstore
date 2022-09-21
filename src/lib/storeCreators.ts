@@ -30,7 +30,7 @@ export function getInitialState<State>(
 	return mode === 'primitive' ? (state as any).$init : { ...state };
 }
 
-export function getActions<State>(slice: ExSlice<State>) {
+export function getActionsFromSlice<State>(slice: ExSlice<State>) {
 	const actions = Object.entries(slice).filter(([, value]) => typeof value === 'function');
 	return Object.fromEntries(actions) as OnlyFunc<State>;
 }

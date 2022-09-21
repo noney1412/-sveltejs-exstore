@@ -1,6 +1,11 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { getActions as getActionsFromSlice, analyzeMode, getInitialState, getOnlyStateFormSlice } from './storeCreators';
+import {
+	getActionsFromSlice,
+	analyzeMode,
+	getInitialState,
+	getOnlyStateFormSlice
+} from './storeCreators';
 import withReduxDevtool from './middlewares/withReduxDevtools';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
