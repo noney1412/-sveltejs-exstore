@@ -8,3 +8,4 @@ node_modules
 !.env.example
 *.todo
 /diagrams
+src/.vscode/settings.json
