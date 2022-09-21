@@ -60,9 +60,13 @@ export const count = ex<Count>({
 
 ### 3. Finally, manage your state with the redux devtools
 
-![Screenshot_2.png](/docs/screenshots/Screenshot_2.png/Screenshot_2.png)
+<p align="center">
+  <img src="/docs/screenshots/Screenshot_2.png" width="350" title="hover text">
+</p>
 
-![Screenshot_3.png](/docs/screenshots/Screenshot_3.png/Screenshot_3.png)
+<p align="center">
+  <img src="/docs/screenshots/Screenshot_3.png" width="350" title="hover text">
+</p>
 
 ## More examples
 
