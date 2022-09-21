@@ -1,7 +1,6 @@
 import type { ExSlice, Extensions } from './types/ExSlice';
 import type { OnlyFunc, OnlyState } from './types/Utils';
 interface SharedState<T> {
-	name: string;
 	reference: OnlyState<T>;
 	mode: 'primitive' | 'reference';
 	initialState: OnlyState<T> extends { $init: infer U } ? U : OnlyState<T>;
@@ -9,13 +8,11 @@ interface SharedState<T> {
 
 export function initSharedState<State>(slice: ExSlice<State>) {
 	const state: SharedState<State> = {
-		name: '',
 		reference: {} as OnlyState<State>,
 		mode: 'primitive',
 		initialState: ({} as any).$init ?? undefined
 	};
 
-	state.name = slice.$name || 'anonymous_';
 	state.reference = getOnlyStateFormSlice(slice);
 	state.mode = analyzeMode(slice);
 	state.initialState = getInitialState(state);
