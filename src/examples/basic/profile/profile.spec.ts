@@ -1,7 +1,7 @@
 import { render, fireEvent, screen } from '@testing-library/svelte';
 import Profile from './Profile.svelte';
 
-test('render <Profile /> and bind input with store.', async () => {
+test('render <Profile /> and profile store', async () => {
 	render(Profile);
 	const displayName = screen.getByTestId('display-name');
 	const displayAge = screen.getByTestId('display-age');
@@ -17,4 +17,10 @@ test('render <Profile /> and bind input with store.', async () => {
 
 	expect(displayName).toHaveTextContent('Sam Wilson');
 	expect(displayAge).toHaveTextContent('99');
+
+	await fireEvent.input(inputName, { target: { value: 'Joe Brown' } });
+	await fireEvent.input(inputAge, { target: { value: 35 } });
+
+	expect(displayName).toHaveTextContent('Joe Brown');
+	expect(displayAge).toHaveTextContent('35');
 });

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import Count from './Count.svelte';
 
-test('render <Count /> and fire click & input events.', async () => {
+test('render <Count /> and count store.', async () => {
 	render(Count);
 
 	const number = screen.getByRole('heading', {
