@@ -12,3 +12,4 @@ node_modules
 *.todo
 /diagrams
 src/.vscode/settings.json
+.vscode/settings.json
