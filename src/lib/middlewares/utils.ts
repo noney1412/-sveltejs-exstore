@@ -1,4 +1,4 @@
-export const isReadyForBrowser = async () => {
+export const isReadyForBrowser = () => {
 	if (typeof window !== 'undefined') return false;
 
 	return true;
