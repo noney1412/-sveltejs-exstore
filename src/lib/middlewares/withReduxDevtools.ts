@@ -108,7 +108,7 @@ const traceStore = writable<string>(undefined);
 
 const devtoolOptions = {
 	name: getTitle() ?? 'no title',
-	instanceId: getInstanceId() ?? 'no instanceId',
+	instanceId: getInstanceId(),
 	shouldHotReload: false,
 	trace: () => {
 		const trace = get(traceStore);
@@ -133,8 +133,6 @@ const shared = {
 };
 
 function withReduxDevtool<State>(middleware: ExMiddleware<State>) {
-	if (!isReadyForBrowser()) return;
-
 	update();
 	initStore();
 	subscribeStore();
