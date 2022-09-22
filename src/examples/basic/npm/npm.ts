@@ -1,4 +1,4 @@
-import { ex } from "svelte-exstore";
+import { ex } from "svelte-exstore/index";
 
 export interface Count {
 	$init: number;
