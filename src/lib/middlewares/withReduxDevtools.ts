@@ -135,6 +135,8 @@ const shared = {
 };
 
 function withReduxDevtool<State>(middleware: ExMiddleware<State>) {
+	if (!isReadyForBrowser()) return;
+
 	update();
 	initStore();
 	subscribeStore();
