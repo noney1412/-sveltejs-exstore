@@ -2,6 +2,8 @@ import type { ExMiddleware } from '../types/ExMiddleware';
 import { get, writable } from 'svelte/store';
 import { isReadyForBrowser } from './utils.js';
 
+export const ssr = false;
+
 interface WithReduxDevtoolsOption {
 	/**
 	 * The name of the action to be displayed in the Redux DevTools.

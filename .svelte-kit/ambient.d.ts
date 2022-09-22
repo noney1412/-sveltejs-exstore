@@ -49,7 +49,6 @@ declare module '$env/static/private' {
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
-	export const NODE_ENV: string;
 	export const NODE_PATH: string;
 	export const npm_config_engine_strict: string;
 	export const npm_config_legacy_peer_deps: string;
@@ -218,7 +217,6 @@ declare module '$env/dynamic/private' {
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
-		NODE_ENV: string;
 		NODE_PATH: string;
 		npm_config_engine_strict: string;
 		npm_config_legacy_peer_deps: string;
