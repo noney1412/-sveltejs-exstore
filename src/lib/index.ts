@@ -1,3 +1,5 @@
+export const ssr = false;
+
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import {
@@ -114,7 +116,8 @@ export function ex<State>(slice: ExSlice<State>) {
 	function applyMiddleware() {
 		// REMARK: Infer user to use devtool by providing $name.
 		middleware.subscribe((m) => {
-			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
+			if (slice.$name && process.env.NODE_ENV !== 'production')
+				withReduxDevtool<WritableState<InitialState>>(m);
 		});
 	}
 
