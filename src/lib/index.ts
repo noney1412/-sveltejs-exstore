@@ -5,8 +5,8 @@ import {
 	analyzeMode,
 	getInitialState,
 	getOnlyStateFormSlice
-} from './storeCreators';
-import withReduxDevtool from './middlewares/withReduxDevtools';
+} from './storeCreators.js';
+import withReduxDevtool from './middlewares/withReduxDevtools.js';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
 import type { OnlyFunc, Nullable } from './types/Utils';
