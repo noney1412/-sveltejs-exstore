@@ -97,20 +97,20 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 function getTitle() {
 	if (!isReadyForBrowser()) return;
 
-	return window ? window.document.title : '';
+	return window.document.title;
 }
 
 function getInstanceId() {
 	if (!isReadyForBrowser()) return;
 
-	return window ? window.btoa(location.href) : '';
+	return window.btoa(location.href);
 }
 
 const traceStore = writable<string>(undefined);
 
 const devtoolOptions = {
 	name: getTitle() ?? 'no title',
-	instanceId: getInstanceId(),
+	instanceId: getInstanceId() ?? 'no instanceId',
 	shouldHotReload: false,
 	trace: () => {
 		const trace = get(traceStore);
