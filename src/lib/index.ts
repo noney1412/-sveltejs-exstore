@@ -12,6 +12,8 @@ import type { ExSlice } from './types/ExSlice';
 import type { OnlyFunc, Nullable } from './types/Utils';
 import { isReadyForBrowser } from './middlewares/utils.js';
 
+export const ssr = false;
+
 type WritableState<T> = T | Record<string, T>;
 
 export function ex<State>(slice: ExSlice<State>) {
