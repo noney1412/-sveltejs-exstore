@@ -13,7 +13,7 @@ import type { OnlyFunc, Nullable } from './types/Utils';
 
 type WritableState<T> = T | Record<string, T>;
 
-export function ex<State>(slice: ExSlice<State>) {
+export default function ex<State>(slice: ExSlice<State>) {
 	const state = getOnlyStateFormSlice(slice);
 	const mode = analyzeMode(state);
 	const initialState = getInitialState(state, mode);
@@ -126,5 +126,3 @@ export function ex<State>(slice: ExSlice<State>) {
 		return trace;
 	}
 }
-
-
