@@ -71,6 +71,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-exstore": "^2.0.19"
+		"svelte-exstore": "^2.0.21"
 	}
 }
