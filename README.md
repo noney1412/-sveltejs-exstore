@@ -16,51 +16,48 @@ yarn add svelte-exstore
 pnpm add svelte-exstore
 ```
 
-### 1. Create a store
-
-```tsx
-export interface Count {
-	$init: number;
-	increase(): void;
-	decrease(): void;
-	increaseBy(by: number): void;
-	reset(): void;
-}
-
-export const count = ex<Count>({
-	$name: 'count', // `$name` will be displayed in the devtools as a store name.
-	$init: 0,
-	increase: function () {
-		this.$init += 1; // retrieve your current state with `this` keyword.
-	},
-	increaseBy: function (by) {
-		this.$init += by;
-	},
-	decrease: function () {
-		this.$init -= 1;
-	},
-	reset: function () {
-		this.$init = 0;
-	}
-});
-```
-
-### 2. Then bind it to your svelte component
+### 1. Create a store and bind it with component.
 
 ```tsx
 <script lang="ts">
-	import { count } from './count';
+ 	import { ex } from 'svelte-exstore';
+
+	interface Count {
+		$init: number;
+		increase(): void;
+		decrease(): void;
+		increaseBy(by: number): void;
+		reset(): void;
+	}
+
+	const count = ex<Count>({
+		$name: 'count', // `$name` will be displayed in the devtools as a store name.
+		$init: 0,
+		increase: function () {
+			this.$init += 1; // retrieve your current state with `this` keyword.
+		},
+		increaseBy: function (by) {
+			this.$init += by;
+		},
+		decrease: function () {
+			this.$init -= 1;
+		},
+		reset: function () {
+			this.$init = 0;
+		}
+	});
 </script>
 
 <h1>{$count}</h1>
 <!--  $count is an alias for $count.$init  -->
 
-<button on:click={count.increase}>+</button>
-<button on:click={() => count.increaseBy(5)}>+</button>
-<button on:click={count.reset}>reset</button>
+<button on:click={() => count.increase()}>+</button>
+<button on:click={() => count.increaseBy(5)}>increase by 5</button>
+<button on:click={() => count.reset()}>reset</button>
+
 ```
 
-### 3. Finally, manage your state with the redux devtools
+### 2. Finally, manage your state with the redux devtools
 
 <p align="center">
   <img src="/docs/screenshots/Screenshot_2.png"  title="hover text">
