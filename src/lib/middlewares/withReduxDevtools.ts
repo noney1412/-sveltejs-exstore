@@ -97,13 +97,13 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 function getTitle() {
 	if (!isReadyForBrowser()) return;
 
-	return window.document.title;
+	return window ? window.document.title : '';
 }
 
 function getInstanceId() {
 	if (!isReadyForBrowser()) return;
 
-	return window.btoa(location.href);
+	return window ? window.btoa(location.href) : '';
 }
 
 const traceStore = writable<string>(undefined);
