@@ -7,7 +7,7 @@
 		"redux",
 		"store"
 	],
-	"main": "package/index.js",
+	"main": "index.js",
 	"license": "MIT",
 	"author": "Chanon Panpila",
 	"repository": {
