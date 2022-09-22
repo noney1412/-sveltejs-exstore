@@ -5,11 +5,14 @@ import {
 	analyzeMode,
 	getInitialState,
 	getOnlyStateFormSlice
-} from './storeCreators';
-import withReduxDevtool from './middlewares/withReduxDevtools';
+} from './storeCreators.js';
+import withReduxDevtool from './middlewares/withReduxDevtools.js';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
 import type { OnlyFunc, Nullable } from './types/Utils';
+import { isReadyForBrowser } from './middlewares/utils.js';
+
+export const ssr = false;
 
 type WritableState<T> = T | Record<string, T>;
 
@@ -97,7 +100,7 @@ export function ex<State>(slice: ExSlice<State>) {
 		return acc;
 	}, {}) as OnlyFunc<State>;
 
-	// applyMiddleware();
+	applyMiddleware();
 
 	return {
 		subscribe: store.subscribe,
@@ -114,7 +117,7 @@ export function ex<State>(slice: ExSlice<State>) {
 	function applyMiddleware() {
 		// REMARK: Infer user to use devtool by providing $name.
 		middleware.subscribe((m) => {
-			if (slice.$name) withReduxDevtool<WritableState<InitialState>>(m);
+			if (slice.$name && isReadyForBrowser()) withReduxDevtool<WritableState<InitialState>>(m);
 		});
 	}
 
@@ -126,5 +129,3 @@ export function ex<State>(slice: ExSlice<State>) {
 		return trace;
 	}
 }
-
-

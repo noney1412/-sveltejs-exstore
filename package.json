@@ -1,6 +1,6 @@
 {
 	"name": "svelte-exstore",
-	"version": "2.0.12",
+	"version": "2.0.35",
 	"description": "A simple state management library for Svelte, able to connect with Redux DevTools",
 	"keywords": [
 		"svelte",
@@ -71,6 +71,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-exstore": "^2.0.12"
+		"svelte-exstore": "^2.0.31"
 	}
 }

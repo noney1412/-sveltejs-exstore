@@ -1,6 +1,6 @@
 import type { ExMiddleware } from '../types/ExMiddleware';
 import { get, writable } from 'svelte/store';
-import { isReadyForBrowser } from './utils';
+import { isReadyForBrowser } from './utils.js';
 
 interface WithReduxDevtoolsOption {
 	/**
@@ -96,13 +96,11 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 
 function getTitle() {
 	if (!isReadyForBrowser()) return;
-
 	return window.document.title;
 }
 
 function getInstanceId() {
 	if (!isReadyForBrowser()) return;
-
 	return window.btoa(location.href);
 }
 
@@ -110,7 +108,7 @@ const traceStore = writable<string>(undefined);
 
 const devtoolOptions = {
 	name: getTitle() ?? 'no title',
-	instanceId: getInstanceId(),
+	instanceId: getInstanceId() ?? 'no instanceId',
 	shouldHotReload: false,
 	trace: () => {
 		const trace = get(traceStore);
@@ -135,6 +133,8 @@ const shared = {
 };
 
 function withReduxDevtool<State>(middleware: ExMiddleware<State>) {
+	if (!isReadyForBrowser()) return;
+
 	update();
 	initStore();
 	subscribeStore();
