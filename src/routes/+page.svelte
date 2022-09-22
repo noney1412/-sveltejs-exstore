@@ -12,7 +12,6 @@
 		gap="3"
 	>
 		<a href="/examples/count">count example</a>
-		<a href="/npm">npm example</a>
 		<a href="/examples/profile">profile example</a>
 		<a href="/examples/devtools">devtools example</a>
 	</div>
