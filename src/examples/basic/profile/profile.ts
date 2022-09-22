@@ -1,4 +1,4 @@
-import ex from '$lib';
+import { ex } from '$lib';
 
 export interface Profile {
 	name?: string;
