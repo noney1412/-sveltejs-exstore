@@ -1,4 +1,4 @@
-import type { ExMiddleware } from '$lib/types/ExMiddleware';
+import type { ExMiddleware } from '../types/ExMiddleware';
 import { get, writable } from 'svelte/store';
 import { isReadyForBrowser } from './utils';
 
