@@ -10,7 +10,6 @@ import withReduxDevtool from './middlewares/withReduxDevtools.js';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
 import type { OnlyFunc, Nullable } from './types/Utils';
-import { isReadyForBrowser } from './middlewares/utils.js';
 
 type WritableState<T> = T | Record<string, T>;
 
