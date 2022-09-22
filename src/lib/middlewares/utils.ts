@@ -1,7 +1,7 @@
 export const isReadyForBrowser = async () => {
 	const env = {
-		browser: !import.meta.env.SSR || true,
-		dev: __SVELTEKIT_DEV__ || true
+		browser: !import.meta.env.SSR ?? true,
+		dev: __SVELTEKIT_DEV__ ?? true
 	};
 
 	if (!env.browser && !env.dev) return false;
