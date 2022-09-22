@@ -17,9 +17,6 @@
 		"url": "https://github.com/noney1412/svelte-exstore/issues"
 	},
 	"homepage": "https://github.com/noney1412/svelte-exstore",
-	"exports": {
-		".": "./src/lib/index.ts"
-	},
 	"scripts": {
 		"dev": "vite dev --host --mode development",
 		"build": "vite build",
