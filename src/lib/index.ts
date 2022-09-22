@@ -97,7 +97,7 @@ export function ex<State>(slice: ExSlice<State>) {
 		return acc;
 	}, {}) as OnlyFunc<State>;
 
-	applyMiddleware();
+	// applyMiddleware();
 
 	return {
 		subscribe: store.subscribe,
