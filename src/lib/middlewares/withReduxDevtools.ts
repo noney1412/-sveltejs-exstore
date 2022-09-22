@@ -96,13 +96,11 @@ function initDevtool(options: WithReduxDevtoolsOption = { name: 'anonymous', lat
 
 function getTitle() {
 	if (!isReadyForBrowser()) return;
-
 	return window.document.title;
 }
 
 function getInstanceId() {
 	if (!isReadyForBrowser()) return;
-
 	return window.btoa(location.href);
 }
 

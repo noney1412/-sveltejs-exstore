@@ -1,5 +1,5 @@
 export const isReadyForBrowser = () => {
-	if (typeof window !== 'undefined') return false;
+	if (typeof window === 'undefined') return false;
 
 	return true;
 };
