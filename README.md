@@ -2,7 +2,7 @@
 
 This package is basically a writable store wrapper.
 
-connect Redux Devtools to enhance your work flow.
+connecting Redux Devtools to enhance your work flow.
 
 ## Usage
 
