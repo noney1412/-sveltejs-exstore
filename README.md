@@ -118,7 +118,7 @@ const count = ex<Count>({
   }
 });
 ```
-## Reference Value
+### Reference Value
 `profile.ts`
 ```ts
 interface Profile {
