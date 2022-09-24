@@ -105,8 +105,10 @@ export function ex<State>(slice: ExSlice<State>) {
 						}
 						return bindState.$init;
 					} else {
-						fn.apply(prev, args);
-						return prev;
+						const bindState = { ...(prev as OnlyState<State>), ...getActionsFromSlice(slice) };
+						fn.apply(bindState, args);
+						const onlyState = getOnlyStateFormSlice(bindState);
+						return onlyState;
 					}
 				});
 			}
