@@ -26,6 +26,14 @@ export function getInitialState<State>(
 	state: OnlyState<State>,
 	mode: Mode
 ): OnlyState<State> extends { $init: infer U } ? U : OnlyState<State> {
+	if (mode === 'bind-$init') {
+		if (Array.isArray((state as any).$init)) {
+			return (state as any).$init;
+		}
+
+		if ((state as any).$init instanceof Object) return { ...(state as any).$init };
+	}
+
 	return mode === 'bind-$init' ? (state as any).$init : { ...state };
 }
 
