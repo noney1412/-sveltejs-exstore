@@ -1,5 +1,6 @@
 [![Node.js CI](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml/badge.svg)](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml)
 
+
 # Svelte ExStore 
 This package basically acts as a wrapper for writable stores.
 
@@ -8,6 +9,12 @@ This package basically acts as a wrapper for writable stores.
 2. An action uses `this` keyword to manage your state.
 3. Supports [primitive value](#primitive-value), if you assign primitive value using `$init`  eg. `$init: 0`, then `get(store)` return `0`.
 4. When the state is reference type by default, you can simply access it by `this` keyword. read [reference type](#reference-value), for more details...
+
+### Contents
+1. [Installation](#installation)
+2. [Basic Example](#basic-example)
+3. [State Management](#state-management)
+4. [For Vitest support](#for-vitest-support)
 
 ### Installation
 ```tsx
@@ -169,7 +176,8 @@ profile.subscribe((value) => {
 ```
 
 
-## For Vitest support, add this to `setupTests.ts`
+## For Vitest support
+#### add this to `setupTests.ts`
 ```ts
 vi.mock('$app/stores', async () => {
 	const { readable, writable } = await import('svelte/store');
