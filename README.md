@@ -118,4 +118,28 @@ const count = ex<Count>({
   }
 });
 ```
+## Reference Value
+`profile.ts`
+```ts
+interface Profile {
+  name: string;
+  age: number;
+  description?: string;
+  increaseAgeBy: (value:number) => void;
+}
 
+const profile = ex<Profile>({
+  $name: 'profile-test-store'
+  name: '',
+  age: 20,
+  increaseAgeBy(value){
+    this.age += value;
+  }
+})
+```
+`Profile.svelte`
+```svelte
+<h1>{$profile.name}</h1>
+<h2>{$profile.age}</h2>
+<h2>{$profile.description ?? ''}</h2>
+```
