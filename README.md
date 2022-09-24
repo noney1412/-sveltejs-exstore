@@ -145,6 +145,30 @@ const profile = ex<Profile>({
 <h2>{$profile.age}</h2>
 <h2>{$profile.description ?? ''}</h2>
 ```
+### the default function `store.subscribe()`, `store.set()` and `store.update()` are also available.
+```ts
+profile.update((state) => {
+  state = { name: 'Jack', age: 30 };
+  return state;
+});
+
+profile.set({});
+```
+`Profile.svelte`
+```svelte
+<button on:click={() => { profile.set({}); }}> Reset Name </button>
+```
+#### the `store.subscribe()` now provide readonly state by default to prevent unpredictable state change.
+```typescript
+profile.subscribe((value) => {
+  console.log('stage 9: readonly reference', value);
+
+  // if uncomment this, it should throw an error. because the state is readonly.
+  // value.name = 'Jane';
+});
+```
+
+
 ## For Vitest support, add this to `setupTests.ts`
 ```ts
 vi.mock('$app/stores', async () => {
