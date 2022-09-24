@@ -48,7 +48,7 @@ export const count = ex<Count>({
 });
 ```
 #### 2. Bind the store to your component.
-`src/routes/+page`
+`src/routes/+page.svelte`
 ```svelte
 <script lang="ts">
   import { count } from '$lib/store/count';
