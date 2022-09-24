@@ -1,6 +1,6 @@
 export const ssr = false;
 
-import { get, writable } from 'svelte/store';
+import { get, Unsubscriber, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import {
 	getActionsFromSlice,
@@ -62,6 +62,22 @@ export function ex<State>(slice: ExSlice<State>) {
 		middleware.set(m);
 	};
 
+	const wrappedSubscribe = (fn: (value: WritableState<InitialState>) => Unsubscriber) => {
+		let state;
+		const tempState = get(store);
+		let unsubscribe;
+
+		if (tempState && tempState instanceof Object && Array.isArray(state)) {
+			state = { ...tempState };
+			Object.freeze(state);
+			const freezed = () => fn(state);
+			unsubscribe = store.subscribe(freezed);
+			return unsubscribe;
+		} else {
+			return store.subscribe(fn);
+		}
+	};
+
 	const boundActions = Object.keys(actions).reduce((acc, key) => {
 		const fn = actions[key];
 		acc[key] = function (...args: unknown[]) {
@@ -105,7 +121,7 @@ export function ex<State>(slice: ExSlice<State>) {
 	applyMiddleware();
 
 	return {
-		subscribe: store.subscribe,
+		subscribe: wrappedSubscribe,
 		set: wrappedSet,
 		update: wrappedUpdate,
 		...boundActions

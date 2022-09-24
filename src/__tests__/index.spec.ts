@@ -233,6 +233,8 @@ test('stage 6: primitive return value from action', () => {
 	expect(get(count)).toBe(3);
 
 	unsubscribe();
+
+	count.increaseBy(999);
 });
 
 test('stage 7: subscription of the reference type', () => {
@@ -306,25 +308,21 @@ test('stage 9: immutable reference ', () => {
 		name: 'John',
 		age: 20,
 		changeName(name: string) {
-			console.log('name from this', this.name);
 			this.name = name;
 		}
 	});
 
-	// make subscribe readonly.
-	const unsubscribe = profile.subscribe((value) => {
+	profile.subscribe((value) => {
 		console.log('stage 9: immutable reference', value);
 
-		// FIXME: this should not work
-		value.name = 'Jane';
+		// FIXME: this should throw an error.
+		// value.name = 'Jane';
 	});
 
 	profile.update((state) => {
-		state.age = 20;
+		state.age = 35;
 		return state;
 	});
 
-	unsubscribe();
-
-	expect(get(profile)).toEqual({ name: 'John', age: 20 });
+	expect(get(profile)).toEqual({ name: 'John', age: 35 });
 });
