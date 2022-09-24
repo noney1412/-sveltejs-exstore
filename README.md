@@ -61,7 +61,7 @@ export const count = ex<Count>({
 
 
 <h1>{$count}</h1>
-<!--  $count is an alias for $count.$init  -->
+<!--  $count is an alias for count.$init  -->
 
 <button on:click={() => count.increase()}>+</button>
 
@@ -78,3 +78,27 @@ export const count = ex<Count>({
 <p align="center">
   <img src="/docs/screenshots/Screenshot_3.png"  title="hover text">
 </p>
+
+## State Management
+### Primitive Value
+#### with `$init` -- `get(store)` will return `$init`
+`count.ts`
+```typescript
+  interface Count {
+    $init: number;
+    increase: () => void;
+  }
+
+  const count = ex<Count>({
+    $name: 'count-test-store',
+    $init: 0,
+    increase() {
+      this.$init += 1;
+    }
+  });
+```
+`Count.svelte`
+```svelte
+<h1>{$count}</h1>
+<!--  $count is an alias for count.$init  -->
+```
