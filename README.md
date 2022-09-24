@@ -47,7 +47,7 @@ const count = ex<Count>({
 	}
 });
 ```
-#### 2. Bind the store with your component.
+#### 2. Bind the store to your component.
 `src/routes/+page`
 ```svelte
 <script lang="ts">
