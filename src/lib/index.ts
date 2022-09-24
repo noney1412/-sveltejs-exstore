@@ -11,7 +11,7 @@ import {
 import withReduxDevtool from './middlewares/withReduxDevtools.js';
 import type { ExMiddleware } from './types/ExMiddleware';
 import type { ExSlice } from './types/ExSlice';
-import type { OnlyFunc, Nullable } from './types/Utils';
+import type { OnlyFunc, Nullable, OnlyState } from './types/Utils';
 
 type WritableState<T> = T | Record<string, T>;
 
@@ -96,7 +96,8 @@ export function ex<State>(slice: ExSlice<State>) {
 				store.update((prev) => {
 					if (mode === 'bind-$init') {
 						const bindState = {
-							$init: prev
+							$init: prev,
+							...getActionsFromSlice(slice)
 						};
 						const result = fn.apply(bindState, args); // if primitive mode, cache the state in $init.
 						if (result && typeof result !== 'object') {
