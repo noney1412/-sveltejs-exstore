@@ -326,3 +326,37 @@ test('stage 9: immutable reference ', () => {
 
 	expect(get(profile)).toEqual({ name: 'John', age: 35 });
 });
+
+test('stage 10: trigger other actions within the same store', () => {
+	interface Count {
+		$init: number;
+		increase: () => void;
+		double: () => void;
+	}
+
+	const count = ex<Count>({
+		$name: 'count-test-store',
+		$init: 0,
+		increase() {
+			this.$init += 1;
+		},
+		double() {
+			this.increase();
+			this.increase();
+		}
+	});
+
+	const unsubscribe = count.subscribe((value) => {
+		console.log('stage 10: trigger other actions within the same store', value);
+	});
+
+	count.increase();
+
+	expect(get(count)).toBe(1);
+
+	count.double();
+
+	expect(get(count)).toBe(3);
+
+	unsubscribe();
+});
