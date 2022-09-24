@@ -24,26 +24,26 @@ describe('storeCreators: analyzeMode, getOnlyStateFormSlice, getInitialState and
 
 		const $undefined = analyzeMode({ $init: undefined });
 		expect($undefined).toBe(initMode);
+
+		const emptyObject = analyzeMode({ $init: {} });
+		expect(emptyObject).toBe(initMode);
+
+		const array = analyzeMode({ $init: [] });
+		expect(array).toBe(initMode);
+
+		const nestedObject = analyzeMode({ $init: { a: 1 } });
+		expect(nestedObject).toBe(initMode);
 	});
 
 	it('analyzeMode: return reference if the data is reference', () => {
 		const referenceMode: Mode = 'as-reference';
-		const emptyObject = analyzeMode({ $init: {} });
-		expect(emptyObject).toBe(referenceMode);
-
-		const array = analyzeMode({ $init: [] });
-		expect(array).toBe('as-reference');
-
-		const nestedObject = analyzeMode({ $init: { a: 1 } });
-		expect(nestedObject).toBe(referenceMode);
 
 		const profile = analyzeMode({ name: 'John', age: 30 });
 		expect(profile).toBe(referenceMode);
 
 		const profileWithInit = analyzeMode({
 			name: 'John',
-			age: 30,
-			$init: { name: 'John', age: 30 }
+			age: 30
 		});
 
 		expect(profileWithInit).toBe(referenceMode);

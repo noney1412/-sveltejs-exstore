@@ -4,8 +4,7 @@ import type { OnlyFunc, OnlyState } from './types/Utils';
 export type Mode = 'bind-$init' | 'as-reference';
 
 export function analyzeMode<State>(state: OnlyState<State>): Mode {
-	if ((state as any).$init === undefined && !Object.hasOwn(state, '$init')) return 'as-reference';
-	return (state as any).$init instanceof Object ? 'as-reference' : 'bind-$init';
+	return Object.hasOwn(state, '$init') ? 'bind-$init' : 'as-reference';
 }
 
 export function getOnlyStateFormSlice<State>(slice: ExSlice<State>): OnlyState<State> {
