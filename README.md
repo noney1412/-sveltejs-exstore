@@ -16,8 +16,8 @@ yarn add svelte-exstore
 pnpm add svelte-exstore
 ```
 
-### Basic Example
-#### 1. Create a store
+## Basic Example
+### 1. Create a store
 `src/lib/store/count.ts`
 ```typescript
 import { ex } from "svelte-exstore";
@@ -47,7 +47,7 @@ export const count = ex<Count>({
   }
 });
 ```
-#### 2. Bind the store to your component.
+### 2. Bind the store to your component.
 `src/routes/+page.svelte`
 ```svelte
 <script lang="ts">
@@ -64,7 +64,7 @@ export const count = ex<Count>({
 
 <button on:click={() => count.reset()}>reset</button>
 ```
-#### 3. Monitor your state with Redux Devtools.
+### 3. Monitor your state with Redux Devtools.
 
 <p align="center">
   <img src="/docs/screenshots/Screenshot_2.png"  title="hover text">
