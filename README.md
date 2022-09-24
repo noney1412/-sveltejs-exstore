@@ -84,21 +84,38 @@ export const count = ex<Count>({
 #### with `$init` -- `get(store)` will return `$init`
 `count.ts`
 ```typescript
-  interface Count {
-    $init: number;
-    increase: () => void;
-  }
+interface Count {
+  $init: number;
+  increase: () => void;
+}
 
-  const count = ex<Count>({
-    $name: 'count-test-store',
-    $init: 0,
-    increase() {
-      this.$init += 1;
-    }
-  });
+const count = ex<Count>({
+  $name: 'count-test-store',
+  $init: 0,
+  increase() {
+    this.$init += 1;
+  }
+});
 ```
 `Count.svelte`
 ```svelte
 <h1>{$count}</h1>
 <!--  $count is an alias for count.$init  -->
 ```
+#### if the state is `primitive type`, the action can also return the value like this.
+`count.ts`
+```typescript
+interface Count {
+  $init: number;
+  increase: () => void;
+}
+
+const count = ex<Count>({
+  $name: 'count-test-store',
+  $init: 0,
+  increase() {
+    return this.$init + 1; // support only primitive type.
+  }
+});
+```
+
