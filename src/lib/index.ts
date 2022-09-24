@@ -81,7 +81,10 @@ export function ex<State>(slice: ExSlice<State>) {
 						const bindState = {
 							$init: prev
 						};
-						fn.apply(bindState, args); // if primitive mode, cache the state in $init.
+						const result = fn.apply(bindState, args); // if primitive mode, cache the state in $init.
+						if (result && typeof result !== 'object') {
+							bindState.$init = result;
+						}
 						return bindState.$init;
 					} else {
 						fn.apply(prev, args);
