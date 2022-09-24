@@ -49,7 +49,7 @@ const count = ex<Count>({
 ```
 #### 2. Bind the store with your component.
 `src/routes/+page`
-```tsx
+```svelte
 <script lang="ts">
   import { count } from '$lib/store/count';
 </script>
