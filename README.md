@@ -4,9 +4,10 @@
 This package basically acts as a wrapper for writable stores.
 
 ### Features
-1. connects Redux Devtools to monitor your state. multiple stores in the same `+page` is also supported.
-2. an action uses `this` keyword to manage your state.
-3. supports `primitive value`, if you assign primitive value using `$init`  eg. `$init: 0`, then `get(store)` return `0`
+1. Connects Redux Devtools to monitor your state. multiple stores in the same `+page` is also supported.
+2. An action uses `this` keyword to manage your state.
+3. Supports [primitive value](#primitive-value), if you assign primitive value using `$init`  eg. `$init: 0`, then `get(store)` return `0`.
+4. When the state is reference type by default, you can simply access it by `this` keyword. read [reference type](#reference-value), for more details...
 
 ### Installation
 ```tsx
@@ -119,6 +120,7 @@ const count = ex<Count>({
 });
 ```
 ### Reference Value
+#### When the state is reference type by default, you can simply access it by `this` keyword.
 `profile.ts`
 ```ts
 interface Profile {
