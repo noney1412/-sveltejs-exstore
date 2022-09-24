@@ -327,7 +327,7 @@ test('stage 9: immutable reference ', () => {
 	expect(get(profile)).toEqual({ name: 'John', age: 35 });
 });
 
-test('stage 10: trigger other actions within the same store', () => {
+test('stage 10: (primitive-mode) trigger other actions within the same store', () => {
 	interface Count {
 		$init: number;
 		increase: () => void;
@@ -347,7 +347,7 @@ test('stage 10: trigger other actions within the same store', () => {
 	});
 
 	const unsubscribe = count.subscribe((value) => {
-		console.log('stage 10: trigger other actions within the same store', value);
+		console.log('stage 10: (primitive-mode) trigger other actions within the same store', value);
 	});
 
 	count.increase();
@@ -357,6 +357,41 @@ test('stage 10: trigger other actions within the same store', () => {
 	count.double();
 
 	expect(get(count)).toBe(3);
+
+	unsubscribe();
+});
+
+test('stage 11: (reference-mode) trigger other actions within the same store', () => {
+	interface Profile {
+		name: string;
+		changeName: (name: string) => void;
+		changeNameIfJohn: (name: string) => void;
+	}
+
+	const profile = ex<Profile>({
+		$name: 'count-test-store',
+		name: '',
+		changeName(name: string) {
+			this.name = name;
+		},
+		changeNameIfJohn(name: string) {
+			if (this.name === 'John') {
+				this.changeName(name);
+			}
+		}
+	});
+
+	const unsubscribe = profile.subscribe((value) => {
+		console.log('stage 11: (reference-mode) trigger other actions within the same store', value);
+	});
+
+	profile.changeName('John');
+
+	expect(get(profile).name).toBe('John');
+
+	profile.changeNameIfJohn('Not John');
+
+	expect(get(profile).name).toBe('Not John');
 
 	unsubscribe();
 });
