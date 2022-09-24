@@ -207,3 +207,24 @@ test('Typecheck ExSlice<State> for including $init', () => {
 
 	expect(count.$init).toBe(1);
 });
+
+test('Higher order function to modify subscriber', () => {
+	const customFunc = function (fn) {
+		return (args) => {
+			Object.freeze(args);
+			return fn(args);
+		};
+	};
+
+	const change = customFunc((value) => {
+		value.a = 2;
+	});
+
+	const obj = {
+		a: 999
+	};
+
+	expect(() => {
+		change(obj);
+	}).toThrowError();
+});
