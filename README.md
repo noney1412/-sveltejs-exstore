@@ -1,5 +1,6 @@
 [![Node.js CI](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml/badge.svg)](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml)
 
+
 # Svelte ExStore 
 This package basically acts as a wrapper for writable stores.
 
@@ -8,6 +9,12 @@ This package basically acts as a wrapper for writable stores.
 2. An action uses `this` keyword to manage your state.
 3. Supports [primitive value](#primitive-value), if you assign primitive value using `$init`  eg. `$init: 0`, then `get(store)` return `0`.
 4. When the state is reference type by default, you can simply access it by `this` keyword. read [reference type](#reference-value), for more details...
+
+### Contents
+1. [Installation](#installation)
+2. [Basic Example](#basic-example)
+3. [State Management](#state-management)
+4. [For Vitest support](#for-vitest-support)
 
 ### Installation
 ```tsx
@@ -144,4 +151,90 @@ const profile = ex<Profile>({
 <h1>{$profile.name}</h1>
 <h2>{$profile.age}</h2>
 <h2>{$profile.description ?? ''}</h2>
+```
+### the default function `store.subscribe()`, `store.set()` and `store.update()` are also available.
+```ts
+profile.update((state) => {
+  state = { name: 'Jack', age: 30 };
+  return state;
+});
+
+profile.set({});
+```
+`Profile.svelte`
+```svelte
+<button on:click={() => { profile.set({}); }}> Reset Name </button>
+```
+#### the `store.subscribe()` now provide readonly state by default to prevent unpredictable state change.
+```typescript
+profile.subscribe((value) => {
+  console.log('stage 9: readonly reference', value);
+
+  // if uncomment this, it should throw an error. because the state is readonly.
+  // value.name = 'Jane';
+});
+```
+
+
+## For Vitest support
+#### add this to `setupTests.ts`
+```ts
+vi.mock('$app/stores', async () => {
+	const { readable, writable } = await import('svelte/store');
+	/**
+	 * @type {import('$app/stores').getStores}
+	 */
+	const getStores = () => ({
+		navigating: readable(null),
+		page: readable({ url: new URL('http://localhost'), params: {} }),
+		session: writable(null),
+		updated: readable(false)
+	});
+	/** @type {typeof import('$app/stores').page} */
+	const page = {
+		subscribe(fn: () => void) {
+			return getStores().page.subscribe(fn);
+		}
+	};
+	/** @type {typeof import('$app/stores').navigating} */
+	const navigating = {
+		subscribe(fn: () => void) {
+			return getStores().navigating.subscribe(fn);
+		}
+	};
+	/** @type {typeof import('$app/stores').session} */
+	const session = {
+		subscribe(fn: () => void) {
+			return getStores().session.subscribe(fn);
+		}
+	};
+	/** @type {typeof import('$app/stores').updated} */
+	const updated = {
+		subscribe(fn: () => void) {
+			return getStores().updated.subscribe(fn);
+		}
+	};
+	return {
+		getStores,
+		navigating,
+		page,
+		session,
+		updated
+	};
+});
+
+vi.mock('$app/environment', async () => {
+	/** @type {typeof import('$app/environment').browser} */
+	const browser = true;
+	/** @type {typeof import('$app/environment').dev} */
+	const dev = true;
+	/** @type {typeof import('$app/environment').prerendering} */
+	const prerendering = false;
+
+	return {
+		browser,
+		dev,
+		prerendering
+	};
+});
 ```
