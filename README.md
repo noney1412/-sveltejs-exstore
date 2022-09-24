@@ -30,7 +30,7 @@ interface Count {
   reset(): void;
 }
 
-const count = ex<Count>({
+export const count = ex<Count>({
   $name: 'count', // store name displayed in devtools, must be unique.
   $init: 0,
   increase() {
