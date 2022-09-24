@@ -1,7 +1,7 @@
 export const ssr = false;
 
-import { get, Unsubscriber, writable } from 'svelte/store';
-import type { Writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
+import type { Writable, Unsubscriber } from 'svelte/store';
 import {
 	getActionsFromSlice,
 	analyzeMode,
@@ -74,7 +74,8 @@ export function ex<State>(slice: ExSlice<State>) {
 			unsubscribe = store.subscribe(freezed);
 			return unsubscribe;
 		} else {
-			return store.subscribe(fn);
+			unsubscribe = store.subscribe(fn);
+			return unsubscribe;
 		}
 	};
 
