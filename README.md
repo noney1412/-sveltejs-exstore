@@ -23,28 +23,28 @@ pnpm add svelte-exstore
 import { ex } from "svelte-exstore";
   
 interface Count {
-	$init: number;
-	increase(): void;
-	decrease(): void;
-	increaseBy(by: number): void;
-	reset(): void;
+  $init: number;
+  increase(): void;
+  decrease(): void;
+  increaseBy(by: number): void;
+  reset(): void;
 }
 
 const count = ex<Count>({
-	$name: 'count', // store name displayed in devtools, must be unique.
-	$init: 0,
-	increase: function () {
-	  this.$init += 1; // retrieve your current state with `this` keyword.
-	},
-	increaseBy: function (by) {
-	  this.$init += by;
-	},
-	decrease: function () {
-	  this.$init -= 1;
-	},
-	reset: function () {
-	  this.$init = 0;
-	}
+  $name: 'count', // store name displayed in devtools, must be unique.
+  $init: 0,
+  increase() {
+    this.$init += 1; // retrieve your current state with `this` keyword.
+  },
+  increaseBy(by) {
+    this.$init += by;
+  },
+  decrease() {
+    this.$init -= 1;
+  },
+  reset() {
+    this.$init = 0;
+  }
 });
 ```
 #### 2. Bind the store to your component.
@@ -64,3 +64,12 @@ const count = ex<Count>({
 
 <button on:click={() => count.reset()}>reset</button>
 ```
+#### 3. You can monitor your state with Redux Devtools.
+
+<p align="center">
+  <img src="/docs/screenshots/Screenshot_2.png"  title="hover text">
+</p>
+
+<p align="center">
+  <img src="/docs/screenshots/Screenshot_3.png"  title="hover text">
+</p>
