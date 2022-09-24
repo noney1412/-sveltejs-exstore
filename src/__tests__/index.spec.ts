@@ -315,7 +315,7 @@ test('stage 9: immutable reference ', () => {
 	profile.subscribe((value) => {
 		console.log('stage 9: immutable reference', value);
 
-		// FIXME: this should throw an error.
+		// FIX: if uncomment this should throw an error.
 		// value.name = 'Jane';
 	});
 
