@@ -195,7 +195,7 @@ test('stage 5: without actions', () => {
 	expect(get(count)).toBe(0);
 });
 
-test('stage 6: subscription of the primitive type', () => {
+test('stage 6: primitive return value from action', () => {
 	// add primitive type to the store
 	interface Count {
 		$init: number;
