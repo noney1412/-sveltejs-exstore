@@ -1,7 +1,12 @@
 [![Node.js CI](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml/badge.svg)](https://github.com/noney1412/svelte-exstore/actions/workflows/node.js.yml)
 
 # Svelte ExStore 
-This package basically acts as a wrapper for writable stores that connects Redux Devtools to improve workflow.
+This package basically acts as a wrapper for writable stores.
+
+### Features
+1. connects Redux Devtools to monitor your state. multiple stores in the same `+page` is also supported.
+2. an action uses `this` keyword to manage your state.
+3. supports `primitive value`, if you assign primitive value using `$init`  eg. `$init: 0`, then `get(store)` return `0`
 
 ### Installation
 ```tsx
