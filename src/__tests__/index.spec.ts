@@ -1,5 +1,4 @@
 import { ex } from '$lib';
-import { analyzeMode } from '$lib/storeCreators';
 import { get } from 'svelte/store';
 
 test('stage 1: with primitive initialValue', () => {
@@ -101,10 +100,6 @@ test('stage 3: with array initialValue', () => {
 		addTodo: (todo: Todo) => void;
 	}
 
-	const mode = analyzeMode({ $init: [] });
-
-	console.log(mode);
-
 	const todoList = ex<TodoList>({
 		$name: 'todo-list-test-store',
 		$init: [],
@@ -120,8 +115,6 @@ test('stage 3: with array initialValue', () => {
 	});
 
 	todoList.addTodo({ id: 0, title: 'todo 0' });
-
-	// expect(get(todoList)).toEqual([{ id: 0, title: 'todo 0' }]);
 
 	todoList.addTodo({ id: 1, title: 'todo 1' });
 
