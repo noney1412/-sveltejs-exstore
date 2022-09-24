@@ -129,7 +129,7 @@ interface Profile {
 }
 
 const profile = ex<Profile>({
-  $name: 'profile-test-store'
+  $name: 'profile-test-store',
   name: '',
   age: 20,
   increaseAgeBy(value){
