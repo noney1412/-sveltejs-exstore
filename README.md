@@ -64,7 +64,7 @@ export const count = ex<Count>({
 
 <button on:click={() => count.reset()}>reset</button>
 ```
-#### 3. You can monitor your state with Redux Devtools.
+#### 3. Monitor your state with Redux Devtools.
 
 <p align="center">
   <img src="/docs/screenshots/Screenshot_2.png"  title="hover text">
