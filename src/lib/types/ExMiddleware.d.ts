@@ -1,5 +1,5 @@
 import type { Writable } from 'svelte/store';
-import type { Nullable } from './utils';
+import type { Nullable } from './Utils';
 export type ExMiddleware<State> = {
 	storeName: string;
 	initialState: State;

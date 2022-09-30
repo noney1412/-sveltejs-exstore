@@ -30,7 +30,6 @@ declare module '$env/static/private' {
 	export const ACSvcPort: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
-	export const APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 	export const ChocolateyInstall: string;
 	export const ChocolateyLastPathUpdate: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
@@ -52,6 +51,7 @@ declare module '$env/static/private' {
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
+	export const NODE_ENV: string;
 	export const NODE_PATH: string;
 	export const npm_config_engine_strict: string;
 	export const npm_config_legacy_peer_deps: string;
@@ -65,7 +65,6 @@ declare module '$env/static/private' {
 	export const npm_node_execpath: string;
 	export const npm_package_author: string;
 	export const npm_package_bugs_url: string;
-	export const npm_package_dependencies_svelte_exstore: string;
 	export const npm_package_description: string;
 	export const npm_package_devDependencies_cypress: string;
 	export const npm_package_devDependencies_eslint: string;
@@ -201,7 +200,6 @@ declare module '$env/dynamic/private' {
 		ACSvcPort: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
-		APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 		ChocolateyInstall: string;
 		ChocolateyLastPathUpdate: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
@@ -223,6 +221,7 @@ declare module '$env/dynamic/private' {
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
+		NODE_ENV: string;
 		NODE_PATH: string;
 		npm_config_engine_strict: string;
 		npm_config_legacy_peer_deps: string;
@@ -236,7 +235,6 @@ declare module '$env/dynamic/private' {
 		npm_node_execpath: string;
 		npm_package_author: string;
 		npm_package_bugs_url: string;
-		npm_package_dependencies_svelte_exstore: string;
 		npm_package_description: string;
 		npm_package_devDependencies_cypress: string;
 		npm_package_devDependencies_eslint: string;

@@ -119,4 +119,24 @@ describe('storeCreators: analyzeMode, getOnlyStateFormSlice, getInitialState and
 		const onlyActions = getActionsFromSlice(profile);
 		expect(onlyActions).toEqual({ changeName: profile.changeName, changeAge: profile.changeAge });
 	});
+
+	it('getActionsFromSlice: bind actions to current slice', () => {
+		const count = {
+			$name: 'count-store',
+			$init: 0,
+			increment() {
+				this.$init += 1;
+			},
+			double() {
+				this.increment();
+				this.increment();
+			}
+		};
+
+		const actions = getActionsFromSlice(count);
+
+		actions.double.bind(count)();
+
+		expect(count.$init).toBe(2);
+	});
 });
